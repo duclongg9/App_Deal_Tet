@@ -17,12 +17,7 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final u = userName.trim();
-      final p = password.trim();
-      if (u.isEmpty || p.isEmpty) {
-        throw Exception('Please enter username');
-      }
-      session = await repo.login(u, p);
+      session = await repo.login(userName, password);
       return true;
     } catch (e) {
       session = null;
