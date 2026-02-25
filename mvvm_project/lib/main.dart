@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mvvm_project/di.dart';
 import 'package:mvvm_project/viewmodels/login/login_viewmodel.dart';
+import 'package:mvvm_project/viewmodels/tet/tet_budget_viewmodel.dart';
 import 'package:mvvm_project/views/login_page.dart';
 import 'package:provider/provider.dart';
 
@@ -14,8 +15,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<LoginViewModel>(
-      create: (_) => buildLoginVM(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<LoginViewModel>(create: (_) => buildLoginVM()),
+        ChangeNotifierProvider<TetBudgetViewModel>(create: (_) => TetBudgetViewModel()),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
