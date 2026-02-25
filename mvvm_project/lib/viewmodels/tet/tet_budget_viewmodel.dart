@@ -140,12 +140,61 @@ class TetBudgetViewModel extends ChangeNotifier {
     return categoriesByYear(yearId).fold(0, (sum, category) => sum + category.budget);
   }
 
-  List<TetProduct> recentProductsByYear(String yearId, {int limit = 5}) {
+  List<TetProduct> recentProductsByYear(String yearId, {int? limit}) {
     final categoryIds = categoriesByYear(yearId).map((e) => e.id).toSet();
     final items = _products.where((product) => categoryIds.contains(product.categoryId)).toList()
       ..sort((a, b) => b.date.compareTo(a.date));
-    if (items.length <= limit) return items;
+    if (limit == null || items.length <= limit) return items;
     return items.take(limit).toList();
+  }
+
+
+
+  Future<void> updateCategory({
+    required String categoryId,
+    required String name,
+    required int budget,
+  }) async {
+    final updated = await repo.updateCategory(categoryId: categoryId, name: name, budget: budget);
+    final idx = _categories.indexWhere((item) => item.id == categoryId);
+    if (idx >= 0) {
+      _categories[idx] = updated;
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteCategory(String categoryId) async {
+    await repo.deleteCategory(categoryId: categoryId);
+    _categories.removeWhere((item) => item.id == categoryId);
+    _products.removeWhere((item) => item.categoryId == categoryId);
+    notifyListeners();
+  }
+
+  Future<void> updateProduct({
+    required String productId,
+    required String name,
+    required int price,
+    required DateTime date,
+    required String description,
+  }) async {
+    final updated = await repo.updateProduct(
+      productId: productId,
+      name: name,
+      price: price,
+      date: date,
+      description: description,
+    );
+    final idx = _products.indexWhere((item) => item.id == productId);
+    if (idx >= 0) {
+      _products[idx] = updated;
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteProduct(String productId) async {
+    await repo.deleteProduct(productId: productId);
+    _products.removeWhere((item) => item.id == productId);
+    notifyListeners();
   }
 
   TetCategory? categoryById(String id) {

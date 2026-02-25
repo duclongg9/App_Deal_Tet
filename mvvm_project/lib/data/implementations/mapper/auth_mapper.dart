@@ -12,6 +12,7 @@ class AuthSessionMapper implements IMapper<LoginResponseDto, AuthSession> {
       user: User(
         id: input.user.id,
         userName: input.user.userName,
+        role: input.user.role,
       ),
     );
   }

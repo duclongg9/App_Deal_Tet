@@ -32,6 +32,21 @@ class TetBudgetRepository implements ITetBudgetRepository {
   }
 
   @override
+  Future<TetCategory> updateCategory({
+    required String categoryId,
+    required String name,
+    required int budget,
+  }) async {
+    final dto = await api.updateCategory(categoryId: categoryId, name: name, budget: budget);
+    return mapper.toCategory(dto);
+  }
+
+  @override
+  Future<void> deleteCategory({required String categoryId}) {
+    return api.deleteCategory(categoryId: categoryId);
+  }
+
+  @override
   Future<TetProduct> createProduct({
     required String categoryId,
     required String name,
@@ -51,5 +66,28 @@ class TetBudgetRepository implements ITetBudgetRepository {
       description: description,
     );
     return mapper.toProduct(dto);
+  }
+
+  @override
+  Future<TetProduct> updateProduct({
+    required String productId,
+    required String name,
+    required int price,
+    required DateTime date,
+    required String description,
+  }) async {
+    final dto = await api.updateProduct(
+      productId: productId,
+      name: name,
+      price: price,
+      date: date,
+      description: description,
+    );
+    return mapper.toProduct(dto);
+  }
+
+  @override
+  Future<void> deleteProduct({required String productId}) {
+    return api.deleteProduct(productId: productId);
   }
 }

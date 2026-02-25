@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mvvm_project/viewmodels/login/login_viewmodel.dart';
 import 'package:mvvm_project/views/home/home_page.dart';
+import 'package:mvvm_project/views/usermangement/user_management_page.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,8 +12,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _userCtrl = TextEditingController(text: 'admin');
-  final _passCtrl = TextEditingController(text: 'FU@2026');
+  final _userCtrl = TextEditingController(text: 'longpham');
+  final _passCtrl = TextEditingController(text: '12345');
   bool _obscure = true;
 
   @override
@@ -46,9 +47,11 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       const Text('🧧 App Deal Tết', style: TextStyle(fontSize: 32, fontWeight: FontWeight.w800)),
                       const SizedBox(height: 6),
-                      Text('Đăng nhập để quản lý chi tiêu Tết thông minh',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey.shade700)),
+                      Text(
+                        'Đăng nhập để quản lý chi tiêu Tết thông minh',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey.shade700),
+                      ),
                       const SizedBox(height: 24),
                       TextField(
                         controller: _userCtrl,
@@ -101,14 +104,16 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _handleLogin() async {
     final vm = context.read<LoginViewModel>();
-    final ok = await vm.login(_userCtrl.text, _passCtrl.text);
+    final ok = await vm.login(_userCtrl.text.trim(), _passCtrl.text);
     if (!ok || !mounted) return;
+
+    final nextPage = vm.session!.user.isAdmin
+        ? const UserManagementPage()
+        : HomePage(userName: vm.session!.user.userName);
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (_) => HomePage(userName: vm.session!.user.userName),
-      ),
+      MaterialPageRoute(builder: (_) => nextPage),
     );
   }
 }
