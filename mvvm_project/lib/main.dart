@@ -8,6 +8,7 @@ import 'package:mvvm_project/views/login_page.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +17,10 @@ Future<void> main() async {
 }
 
 void _configureDatabaseFactory() {
-  if (kIsWeb) return;
+  if (kIsWeb) {
+    databaseFactory = databaseFactoryFfiWeb;
+    return;
+  }
 
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
