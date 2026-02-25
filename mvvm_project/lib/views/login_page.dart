@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mvvm_project/viewmodels/login/login_viewmodel.dart';
+import 'package:mvvm_project/views/admin/admin_home_page.dart';
 import 'package:mvvm_project/views/home/home_page.dart';
-import 'package:mvvm_project/views/usermangement/user_management_page.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -117,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
     if (!ok || !mounted) return;
 
     final nextPage = vm.session!.user.isAdmin
-        ? const UserManagementPage()
+        ? AdminHomePage(userName: vm.session!.user.userName)
         : HomePage(userName: vm.session!.user.userName);
 
     Navigator.pushReplacement(
