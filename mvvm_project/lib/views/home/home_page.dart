@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tết Trong Tay'),
+        title: Text('Tết Trong Tay • ${widget.userName}'),
         actions: [
           IconButton(
             onPressed: () => _showYearDialog(context),
@@ -57,18 +57,35 @@ class _HomePageState extends State<HomePage> {
         icon: const Icon(Icons.add),
         label: const Text('Tạo Năm Mới'),
       ),
-      body: selectedYear == null
-          ? const Center(child: Text('Chưa có dữ liệu năm, vui lòng tạo năm mới.'))
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _buildYearBudgetCard(context, vm, selectedYear),
-                const SizedBox(height: 16),
-                _buildDonutCard(vm, selectedYear),
-                const SizedBox(height: 16),
-                _buildRecentHistory(context, vm, selectedYear),
-              ],
-            ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFFF3E0), Color(0xFFFFFDF8)],
+          ),
+        ),
+        child: selectedYear == null
+            ? const Center(child: Text('Chưa có dữ liệu năm, vui lòng tạo năm mới.'))
+            : ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text('Chúc mừng năm mới! Theo dõi ngân sách Tết thông minh ✨',
+                          style: Theme.of(context).textTheme.titleMedium),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildYearBudgetCard(context, vm, selectedYear),
+                  const SizedBox(height: 16),
+                  _buildDonutCard(vm, selectedYear),
+                  const SizedBox(height: 16),
+                  _buildRecentHistory(context, vm, selectedYear),
+                ],
+              ),
+      ),
     );
   }
 
@@ -364,12 +381,12 @@ Future<void> _showYearDialog(BuildContext context) async {
             TextField(controller: budgetCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Tổng ngân sách năm')),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 final year = int.tryParse(yearCtrl.text.trim());
                 final budget = int.tryParse(_digitsOnly(budgetCtrl.text));
                 if (year == null || budget == null || budget <= 0) return;
-                context.read<TetBudgetViewModel>().createYear(year: year, totalBudget: budget);
-                Navigator.pop(context);
+                await context.read<TetBudgetViewModel>().createYear(year: year, totalBudget: budget);
+                if (context.mounted) Navigator.pop(context);
               },
               child: const Text('Lưu'),
             ),
@@ -426,14 +443,15 @@ Future<void> _showCategoryDialog(BuildContext context, TetYear year) async {
                   ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     final budget = int.tryParse(_digitsOnly(budgetCtrl.text));
                     if (nameCtrl.text.trim().isEmpty || budget == null || budget <= 0) return;
-                    final category = context.read<TetBudgetViewModel>().createCategory(
+                    final category = await context.read<TetBudgetViewModel>().createCategory(
                           yearId: year.id,
                           name: nameCtrl.text.trim(),
                           budget: budget,
                         );
+                    if (!context.mounted) return;
                     Navigator.pop(context);
                     Navigator.push(
                       context,
@@ -538,10 +556,10 @@ Future<void> _showProductDialog(BuildContext context, TetCategory category) asyn
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     final priceValue = int.tryParse(_digitsOnly(priceCtrl.text));
                     if (nameCtrl.text.trim().isEmpty || priceValue == null || priceValue <= 0) return;
-                    context.read<TetBudgetViewModel>().addProduct(
+                    await context.read<TetBudgetViewModel>().addProduct(
                           categoryId: category.id,
                           name: nameCtrl.text.trim(),
                           price: priceValue,
@@ -550,7 +568,7 @@ Future<void> _showProductDialog(BuildContext context, TetCategory category) asyn
                           receiptImagePath: '',
                           description: descriptionCtrl.text.trim(),
                         );
-                    Navigator.pop(context);
+                    if (context.mounted) Navigator.pop(context);
                   },
                   child: const Text('Lưu'),
                 ),

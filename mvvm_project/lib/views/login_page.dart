@@ -27,61 +27,71 @@ class _LoginPageState extends State<LoginPage> {
     final vm = context.watch<LoginViewModel>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFEAF3FF),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              children: [
-                const Text(
-                  'Personal Management',
-                  style: TextStyle(
-                    color: Color(0xFF0D47A1),
-                    fontSize: 34,
-                    fontWeight: FontWeight.w800,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFFE0E8), Color(0xFFFFF8E1)],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      const Text('🧧 App Deal Tết', style: TextStyle(fontSize: 32, fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 6),
+                      Text('Đăng nhập để quản lý chi tiêu Tết thông minh',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey.shade700)),
+                      const SizedBox(height: 24),
+                      TextField(
+                        controller: _userCtrl,
+                        enabled: !vm.loading,
+                        decoration: const InputDecoration(hintText: 'Tên đăng nhập'),
+                      ),
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: _passCtrl,
+                        enabled: !vm.loading,
+                        obscureText: _obscure,
+                        decoration: InputDecoration(
+                          hintText: 'Mật khẩu',
+                          suffixIcon: IconButton(
+                            onPressed: vm.loading ? null : () => setState(() => _obscure = !_obscure),
+                            icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
+                          ),
+                        ),
+                        onSubmitted: (_) => _handleLogin(),
+                      ),
+                      if (vm.error != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(vm.error!, style: const TextStyle(color: Colors.red)),
+                        ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: vm.loading ? null : _handleLogin,
+                          child: vm.loading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Text('Vào app ngay', style: TextStyle(fontSize: 18)),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 40),
-                TextField(
-                  controller: _userCtrl,
-                  enabled: !vm.loading,
-                  decoration: const InputDecoration(hintText: 'Username'),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _passCtrl,
-                  enabled: !vm.loading,
-                  obscureText: _obscure,
-                  decoration: InputDecoration(
-                    hintText: 'Password',
-                    suffixIcon: IconButton(
-                      onPressed: vm.loading ? null : () => setState(() => _obscure = !_obscure),
-                      icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
-                    ),
-                  ),
-                  onSubmitted: (_) => _handleLogin(),
-                ),
-                if (vm.error != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Text(vm.error!, style: const TextStyle(color: Colors.red)),
-                  ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: vm.loading ? null : _handleLogin,
-                    child: vm.loading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Sign in', style: TextStyle(fontSize: 18)),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),

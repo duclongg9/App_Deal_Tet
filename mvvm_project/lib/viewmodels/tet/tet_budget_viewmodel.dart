@@ -1,13 +1,17 @@
 import 'package:flutter/foundation.dart';
+import 'package:mvvm_project/data/interfaces/repositories/itet_budget_repository.dart';
 import 'package:mvvm_project/domain/entities/tet_models.dart';
 
 class TetBudgetViewModel extends ChangeNotifier {
+  final ITetBudgetRepository repo;
+
+  TetBudgetViewModel(this.repo);
+
   final List<TetYear> _years = [];
   final List<TetCategory> _categories = [];
   final List<TetProduct> _products = [];
 
   String? _selectedYearId;
-  int _seed = 0;
 
   List<TetYear> get years => List.unmodifiable(_years);
   List<TetCategory> get categories => List.unmodifiable(_categories);
@@ -18,18 +22,21 @@ class TetBudgetViewModel extends ChangeNotifier {
     return _years.where((year) => year.id == _selectedYearId).firstOrNull;
   }
 
-  void ensureSeedData() {
+  Future<void> ensureSeedData() async {
     if (_years.isNotEmpty) return;
 
-    final year = createYear(year: DateTime.now().year, totalBudget: 6000000, silent: true);
-    createCategory(yearId: year.id, name: 'Bánh kẹo', budget: 1000000, silent: true);
-    createCategory(yearId: year.id, name: 'Lì xì', budget: 2000000, silent: true);
-    createCategory(yearId: year.id, name: 'Trang trí', budget: 1500000, silent: true);
+    await _reload();
+    if (_years.isNotEmpty) return;
+
+    final year = await createYear(year: DateTime.now().year, totalBudget: 6000000, silent: true);
+    await createCategory(yearId: year.id, name: 'Bánh kẹo', budget: 1000000, silent: true);
+    await createCategory(yearId: year.id, name: 'Lì xì', budget: 2000000, silent: true);
+    await createCategory(yearId: year.id, name: 'Trang trí', budget: 1500000, silent: true);
 
     final candyCategory = categoriesByYear(year.id).firstWhere((e) => e.name == 'Bánh kẹo');
     final luckyMoneyCategory = categoriesByYear(year.id).firstWhere((e) => e.name == 'Lì xì');
 
-    addProduct(
+    await addProduct(
       categoryId: candyCategory.id,
       name: 'Hộp mứt ABC',
       price: 450000,
@@ -39,7 +46,7 @@ class TetBudgetViewModel extends ChangeNotifier {
       description: 'Siêu thị X',
       silent: true,
     );
-    addProduct(
+    await addProduct(
       categoryId: luckyMoneyCategory.id,
       name: 'Bao lì xì vàng',
       price: 300000,
@@ -53,27 +60,31 @@ class TetBudgetViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  TetYear createYear({required int year, required int totalBudget, bool silent = false}) {
-    final newYear = TetYear(id: _nextId('year'), year: year, totalBudget: totalBudget);
+  Future<TetYear> createYear({
+    required int year,
+    required int totalBudget,
+    bool silent = false,
+  }) async {
+    final newYear = await repo.createYear(year: year, totalBudget: totalBudget);
     _years.add(newYear);
     _selectedYearId ??= newYear.id;
     if (!silent) notifyListeners();
     return newYear;
   }
 
-  TetCategory createCategory({
+  Future<TetCategory> createCategory({
     required String yearId,
     required String name,
     required int budget,
     bool silent = false,
-  }) {
-    final category = TetCategory(id: _nextId('cat'), yearId: yearId, name: name, budget: budget);
+  }) async {
+    final category = await repo.createCategory(yearId: yearId, name: name, budget: budget);
     _categories.add(category);
     if (!silent) notifyListeners();
     return category;
   }
 
-  void addProduct({
+  Future<void> addProduct({
     required String categoryId,
     required String name,
     required int price,
@@ -82,19 +93,18 @@ class TetBudgetViewModel extends ChangeNotifier {
     required String receiptImagePath,
     required String description,
     bool silent = false,
-  }) {
-    _products.add(
-      TetProduct(
-        id: _nextId('prod'),
-        categoryId: categoryId,
-        name: name,
-        price: price,
-        date: date,
-        imagePath: imagePath,
-        receiptImagePath: receiptImagePath,
-        description: description,
-      ),
+  }) async {
+    final product = await repo.createProduct(
+      categoryId: categoryId,
+      name: name,
+      price: price,
+      date: date,
+      imagePath: imagePath,
+      receiptImagePath: receiptImagePath,
+      description: description,
     );
+
+    _products.add(product);
     if (!silent) notifyListeners();
   }
 
@@ -142,8 +152,20 @@ class TetBudgetViewModel extends ChangeNotifier {
     return _categories.where((category) => category.id == id).firstOrNull;
   }
 
-  String _nextId(String prefix) {
-    _seed += 1;
-    return '$prefix-$_seed';
+  Future<void> _reload() async {
+    final bundle = await repo.fetchBundle();
+    _years
+      ..clear()
+      ..addAll(bundle.years);
+    _categories
+      ..clear()
+      ..addAll(bundle.categories);
+    _products
+      ..clear()
+      ..addAll(bundle.products);
+
+    if (_selectedYearId == null && _years.isNotEmpty) {
+      _selectedYearId = _years.first.id;
+    }
   }
 }
