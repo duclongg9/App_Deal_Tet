@@ -52,6 +52,15 @@ class _LoginPageState extends State<LoginPage> {
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.grey.shade700),
                       ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Tài khoản mẫu: admin / FU@2026 hoặc longpham / 12345',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 13,
+                        ),
+                      ),
                       const SizedBox(height: 24),
                       TextField(
                         controller: _userCtrl,
