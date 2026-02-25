@@ -1,14 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mvvm_project/di.dart';
 import 'package:mvvm_project/viewmodels/login/login_viewmodel.dart';
 import 'package:mvvm_project/viewmodels/tet/tet_budget_viewmodel.dart';
 import 'package:mvvm_project/views/login_page.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  _configureDatabaseFactory();
   runApp(const MyApp());
+}
+
+void _configureDatabaseFactory() {
+  if (kIsWeb) return;
+
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
 }
 
 class MyApp extends StatelessWidget {
