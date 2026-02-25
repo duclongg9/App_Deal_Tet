@@ -44,6 +44,26 @@ class MockTetBudgetApi implements ITetBudgetApi {
   }
 
   @override
+  Future<TetCategoryDto> updateCategory({
+    required String categoryId,
+    required String name,
+    required int budget,
+  }) async {
+    final idx = _categories.indexWhere((e) => e.id == categoryId);
+    if (idx < 0) throw Exception('Không tìm thấy hạng mục.');
+    final old = _categories[idx];
+    final item = TetCategoryDto(id: old.id, yearId: old.yearId, name: name, budget: budget);
+    _categories[idx] = item;
+    return item;
+  }
+
+  @override
+  Future<void> deleteCategory({required String categoryId}) async {
+    _categories.removeWhere((e) => e.id == categoryId);
+    _products.removeWhere((e) => e.categoryId == categoryId);
+  }
+
+  @override
   Future<TetProductDto> createProduct({
     required String categoryId,
     required String name,
@@ -65,6 +85,36 @@ class MockTetBudgetApi implements ITetBudgetApi {
     );
     _products.add(item);
     return item;
+  }
+
+  @override
+  Future<TetProductDto> updateProduct({
+    required String productId,
+    required String name,
+    required int price,
+    required DateTime date,
+    required String description,
+  }) async {
+    final idx = _products.indexWhere((e) => e.id == productId);
+    if (idx < 0) throw Exception('Không tìm thấy sản phẩm.');
+    final old = _products[idx];
+    final item = TetProductDto(
+      id: old.id,
+      categoryId: old.categoryId,
+      name: name,
+      price: price,
+      date: date,
+      imagePath: old.imagePath,
+      receiptImagePath: old.receiptImagePath,
+      description: description,
+    );
+    _products[idx] = item;
+    return item;
+  }
+
+  @override
+  Future<void> deleteProduct({required String productId}) async {
+    _products.removeWhere((e) => e.id == productId);
   }
 
   String _nextId(String prefix) {

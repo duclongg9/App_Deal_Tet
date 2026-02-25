@@ -14,6 +14,14 @@ abstract class ITetBudgetApi {
     required int budget,
   });
 
+  Future<TetCategoryDto> updateCategory({
+    required String categoryId,
+    required String name,
+    required int budget,
+  });
+
+  Future<void> deleteCategory({required String categoryId});
+
   Future<TetProductDto> createProduct({
     required String categoryId,
     required String name,
@@ -23,4 +31,14 @@ abstract class ITetBudgetApi {
     required String receiptImagePath,
     required String description,
   });
+
+  Future<TetProductDto> updateProduct({
+    required String productId,
+    required String name,
+    required int price,
+    required DateTime date,
+    required String description,
+  });
+
+  Future<void> deleteProduct({required String productId});
 }

@@ -8,9 +8,12 @@ class MockAuthRepository implements IAuthRepository {
     final displayName = userName.trim().isEmpty ? 'guest' : userName.trim();
     return AuthSession(
       token: 'ui-only-token',
-      user: User(id: '1', userName: displayName),
+      user: User(id: '1', userName: displayName, role: 'user'),
     );
   }
+
+  @override
+  Future<AuthSession?> getCurrentSession() async => null;
 
   @override
   Future<void> logout() async {}

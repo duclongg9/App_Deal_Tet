@@ -35,10 +35,6 @@ class _HomePageState extends State<HomePage> {
         title: Text('Tết Trong Tay • ${widget.userName}'),
         actions: [
           IconButton(
-            onPressed: () => _showYearDialog(context),
-            icon: const Icon(Icons.settings),
-          ),
-          IconButton(
             onPressed: () async {
               await context.read<LoginViewModel>().logout();
               if (!context.mounted) return;
@@ -73,8 +69,10 @@ class _HomePageState extends State<HomePage> {
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Text('Chúc mừng năm mới! Theo dõi ngân sách Tết thông minh ✨',
-                          style: Theme.of(context).textTheme.titleMedium),
+                      child: Text(
+                        'Chúc mừng năm mới! Theo dõi ngân sách Tết thông minh ✨',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -132,8 +130,7 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Đã dùng ${(ratio * 100).toStringAsFixed(0)}%'
-                '${overSpent ? ' • Vượt ngân sách!' : ''}',
+                'Đã dùng ${(ratio * 100).toStringAsFixed(0)}%${overSpent ? ' • Vượt ngân sách!' : ''}',
                 style: TextStyle(color: overSpent ? Colors.red : Colors.black87),
               ),
             ],
@@ -164,7 +161,7 @@ class _HomePageState extends State<HomePage> {
               const Text('Chưa có dữ liệu chi tiêu để hiển thị biểu đồ.')
             else
               SizedBox(
-                height: 180,
+                height: 200,
                 child: Row(
                   children: [
                     Expanded(
@@ -177,23 +174,25 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(data.length, (index) {
-                          final category = data[index].$1;
-                          final spent = data[index].$2;
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Row(
-                              children: [
-                                CircleAvatar(radius: 6, backgroundColor: colors[index % colors.length]),
-                                const SizedBox(width: 8),
-                                Expanded(child: Text('${category.name} – ${formatMoney(spent)}')),
-                              ],
-                            ),
-                          );
-                        }),
+                      child: Scrollbar(
+                        thumbVisibility: true,
+                        child: ListView.builder(
+                          itemCount: data.length,
+                          itemBuilder: (_, index) {
+                            final category = data[index].$1;
+                            final spent = data[index].$2;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Row(
+                                children: [
+                                  CircleAvatar(radius: 6, backgroundColor: colors[index % colors.length]),
+                                  const SizedBox(width: 8),
+                                  Expanded(child: Text('${category.name} – ${formatMoney(spent)}')),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ],
@@ -219,16 +218,26 @@ class _HomePageState extends State<HomePage> {
             if (items.isEmpty)
               const Text('Chưa có sản phẩm nào.')
             else
-              ...items.map((product) {
-                final category = vm.categoryById(product.categoryId);
-                return ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const CircleAvatar(child: Icon(Icons.inventory_2_outlined)),
-                  title: Text(product.name),
-                  subtitle: Text('${category?.name ?? 'N/A'} • ${formatDate(product.date)}'),
-                  trailing: Text('${formatMoney(product.price)}đ'),
-                );
-              }),
+              SizedBox(
+                height: 260,
+                child: Scrollbar(
+                  thumbVisibility: true,
+                  child: ListView.builder(
+                    itemCount: items.length,
+                    itemBuilder: (_, index) {
+                      final product = items[index];
+                      final category = vm.categoryById(product.categoryId);
+                      return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const CircleAvatar(child: Icon(Icons.inventory_2_outlined)),
+                        title: Text(product.name),
+                        subtitle: Text('${category?.name ?? 'N/A'} • ${formatDate(product.date)}'),
+                        trailing: Text('${formatMoney(product.price)}đ'),
+                      );
+                    },
+                  ),
+                ),
+              ),
             const SizedBox(height: 8),
             OutlinedButton(
               onPressed: () {
@@ -294,6 +303,19 @@ class YearDetailPage extends StatelessWidget {
                     LinearProgressIndicator(value: categoryRatio.clamp(0, 1)),
                   ],
                 ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: () => _showEditCategoryDialog(context, category),
+                      icon: const Icon(Icons.edit_outlined),
+                    ),
+                    IconButton(
+                      onPressed: () => _confirmDeleteCategory(context, category),
+                      icon: const Icon(Icons.delete_outline),
+                    ),
+                  ],
+                ),
               ),
             );
           }),
@@ -346,7 +368,19 @@ class CategoryProductPage extends StatelessWidget {
                 title: Text(product.name),
                 subtitle: Text('${formatDate(product.date)}\n${product.description.isEmpty ? 'Chưa có mô tả' : product.description}'),
                 isThreeLine: true,
-                trailing: Text('${formatMoney(product.price)}đ'),
+                trailing: PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'edit') {
+                      _showEditProductDialog(context, product);
+                    } else {
+                      _confirmDeleteProduct(context, product);
+                    }
+                  },
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(value: 'edit', child: Text('Sửa')),
+                    PopupMenuItem(value: 'delete', child: Text('Xóa')),
+                  ],
+                ),
               ),
             ),
           ),
@@ -405,68 +439,95 @@ Future<void> _showCategoryDialog(BuildContext context, TetYear year) async {
     context: context,
     isScrollControlled: true,
     builder: (context) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          final vm = context.watch<TetBudgetViewModel>();
-          final currentBudget = int.tryParse(_digitsOnly(budgetCtrl.text)) ?? 0;
-          final totalBudgetIfAdded = vm.totalCategoryBudgetByYear(year.id) + currentBudget;
-          final exceed = totalBudgetIfAdded > year.totalBudget;
-
-          return Padding(
-            padding: EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 16,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Tạo hạng mục', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 12),
-                TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Tên hạng mục')),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: budgetCtrl,
-                  keyboardType: TextInputType.number,
-                  onChanged: (_) => setState(() {}),
-                  decoration: const InputDecoration(labelText: 'Budget hạng mục'),
-                ),
-                if (exceed)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      '⚠️ Tổng budget hạng mục vượt ngân sách năm (${formatMoney(totalBudgetIfAdded - year.totalBudget)}đ)',
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    final budget = int.tryParse(_digitsOnly(budgetCtrl.text));
-                    if (nameCtrl.text.trim().isEmpty || budget == null || budget <= 0) return;
-                    final category = await context.read<TetBudgetViewModel>().createCategory(
-                          yearId: year.id,
-                          name: nameCtrl.text.trim(),
-                          budget: budget,
-                        );
-                    if (!context.mounted) return;
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => CategoryProductPage(categoryId: category.id)),
+      return Padding(
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 16,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Tạo hạng mục', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Tên hạng mục')),
+            const SizedBox(height: 12),
+            TextField(controller: budgetCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Ngân sách hạng mục')),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                final name = nameCtrl.text.trim();
+                final budget = int.tryParse(_digitsOnly(budgetCtrl.text));
+                if (name.isEmpty || budget == null || budget <= 0) return;
+                await context.read<TetBudgetViewModel>().createCategory(
+                      yearId: year.id,
+                      name: name,
+                      budget: budget,
                     );
-                  },
-                  child: const Text('Lưu'),
-                ),
-              ],
+                if (context.mounted) Navigator.pop(context);
+              },
+              child: const Text('Lưu'),
             ),
-          );
-        },
+          ],
+        ),
       );
     },
   );
+}
+
+Future<void> _showEditCategoryDialog(BuildContext context, TetCategory category) async {
+  final nameCtrl = TextEditingController(text: category.name);
+  final budgetCtrl = TextEditingController(text: category.budget.toString());
+
+  await showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Sửa hạng mục'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Tên hạng mục')),
+          const SizedBox(height: 12),
+          TextField(controller: budgetCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Ngân sách')),
+        ],
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
+        ElevatedButton(
+          onPressed: () async {
+            final budget = int.tryParse(_digitsOnly(budgetCtrl.text));
+            if (nameCtrl.text.trim().isEmpty || budget == null || budget <= 0) return;
+            await context.read<TetBudgetViewModel>().updateCategory(
+                  categoryId: category.id,
+                  name: nameCtrl.text.trim(),
+                  budget: budget,
+                );
+            if (context.mounted) Navigator.pop(context);
+          },
+          child: const Text('Lưu'),
+        ),
+      ],
+    ),
+  );
+}
+
+Future<void> _confirmDeleteCategory(BuildContext context, TetCategory category) async {
+  final ok = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Xóa hạng mục'),
+          content: Text('Bạn có chắc muốn xóa "${category.name}" và toàn bộ sản phẩm liên quan?'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Hủy')),
+            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Xóa')),
+          ],
+        ),
+      ) ??
+      false;
+
+  if (!ok || !context.mounted) return;
+  await context.read<TetBudgetViewModel>().deleteCategory(category.id);
 }
 
 Future<void> _showProductDialog(BuildContext context, TetCategory category) async {
@@ -501,16 +562,8 @@ Future<void> _showProductDialog(BuildContext context, TetCategory category) asyn
                 const SizedBox(height: 12),
                 Text('Hạng mục: ${category.name}', style: const TextStyle(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.image_outlined),
-                  label: const Text('Chọn ảnh sản phẩm'),
-                ),
-                OutlinedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.receipt_long_outlined),
-                  label: const Text('Chụp ảnh hóa đơn'),
-                ),
+                OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.image_outlined), label: const Text('Chọn ảnh sản phẩm')),
+                OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.receipt_long_outlined), label: const Text('Chụp ảnh hóa đơn')),
                 const SizedBox(height: 8),
                 TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Tên sản phẩm')),
                 const SizedBox(height: 12),
@@ -581,6 +634,91 @@ Future<void> _showProductDialog(BuildContext context, TetCategory category) asyn
   );
 }
 
+Future<void> _showEditProductDialog(BuildContext context, TetProduct product) async {
+  final nameCtrl = TextEditingController(text: product.name);
+  final priceCtrl = TextEditingController(text: product.price.toString());
+  final descriptionCtrl = TextEditingController(text: product.description);
+  DateTime selectedDate = product.date;
+
+  await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (context) => StatefulBuilder(
+      builder: (context, setState) => Padding(
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 16,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Sửa sản phẩm', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Tên sản phẩm')),
+            const SizedBox(height: 12),
+            TextField(controller: priceCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Giá mua')),
+            const SizedBox(height: 8),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Ngày mua'),
+              subtitle: Text(formatDate(selectedDate)),
+              trailing: IconButton(
+                onPressed: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime(2100),
+                  );
+                  if (picked != null) setState(() => selectedDate = picked);
+                },
+                icon: const Icon(Icons.calendar_today),
+              ),
+            ),
+            TextField(controller: descriptionCtrl, minLines: 2, maxLines: 4, decoration: const InputDecoration(labelText: 'Mô tả')),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                final price = int.tryParse(_digitsOnly(priceCtrl.text));
+                if (nameCtrl.text.trim().isEmpty || price == null || price <= 0) return;
+                await context.read<TetBudgetViewModel>().updateProduct(
+                      productId: product.id,
+                      name: nameCtrl.text.trim(),
+                      price: price,
+                      date: selectedDate,
+                      description: descriptionCtrl.text.trim(),
+                    );
+                if (context.mounted) Navigator.pop(context);
+              },
+              child: const Text('Lưu'),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+Future<void> _confirmDeleteProduct(BuildContext context, TetProduct product) async {
+  final ok = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Xóa sản phẩm'),
+          content: Text('Bạn có chắc muốn xóa "${product.name}"?'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Hủy')),
+            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Xóa')),
+          ],
+        ),
+      ) ??
+      false;
+
+  if (!ok || !context.mounted) return;
+  await context.read<TetBudgetViewModel>().deleteProduct(product.id);
+}
+
 class _DonutPainter extends CustomPainter {
   final List<double> values;
   final List<Color> colors;
@@ -618,22 +756,19 @@ class _DonutPainter extends CustomPainter {
 
 String _digitsOnly(String value) => value.replaceAll(RegExp(r'[^0-9]'), '');
 
-String formatMoney(int amount) {
-  final value = amount.abs().toString();
+String formatMoney(int value) {
+  final str = value.toString();
   final buffer = StringBuffer();
-  for (var i = 0; i < value.length; i++) {
-    final reverseIndex = value.length - i;
-    buffer.write(value[i]);
-    if (reverseIndex > 1 && reverseIndex % 3 == 1) {
-      buffer.write('.');
-    }
+  for (var i = 0; i < str.length; i++) {
+    final reversedIndex = str.length - i;
+    buffer.write(str[i]);
+    if (reversedIndex > 1 && reversedIndex % 3 == 1) buffer.write('.');
   }
-  return amount < 0 ? '-${buffer.toString()}' : buffer.toString();
+  return buffer.toString();
 }
 
 String formatDate(DateTime date) {
   final day = date.day.toString().padLeft(2, '0');
   final month = date.month.toString().padLeft(2, '0');
-  final year = date.year.toString();
-  return '$day/$month/$year';
+  return '$day/$month/${date.year}';
 }

@@ -23,6 +23,14 @@ abstract class ITetBudgetRepository {
     required int budget,
   });
 
+  Future<TetCategory> updateCategory({
+    required String categoryId,
+    required String name,
+    required int budget,
+  });
+
+  Future<void> deleteCategory({required String categoryId});
+
   Future<TetProduct> createProduct({
     required String categoryId,
     required String name,
@@ -32,4 +40,14 @@ abstract class ITetBudgetRepository {
     required String receiptImagePath,
     required String description,
   });
+
+  Future<TetProduct> updateProduct({
+    required String productId,
+    required String name,
+    required int price,
+    required DateTime date,
+    required String description,
+  });
+
+  Future<void> deleteProduct({required String productId});
 }
