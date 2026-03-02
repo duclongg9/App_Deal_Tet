@@ -17,7 +17,11 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+enum HomeVisualVariant { smoothPremium, contrastBug }
+
 class _HomePageState extends State<HomePage> {
+  HomeVisualVariant _variant = HomeVisualVariant.smoothPremium;
+
   @override
   void initState() {
     super.initState();
@@ -30,11 +34,27 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final vm = context.watch<TetBudgetViewModel>();
     final selectedYear = vm.selectedYear;
+    final isBugVariant = _variant == HomeVisualVariant.contrastBug;
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Tết Trong Tay • ${widget.userName}'),
         actions: [
+          PopupMenuButton<HomeVisualVariant>(
+            tooltip: 'Chọn biến thể giao diện',
+            initialValue: _variant,
+            onSelected: (value) => setState(() => _variant = value),
+            itemBuilder: (_) => const [
+              PopupMenuItem(
+                value: HomeVisualVariant.smoothPremium,
+                child: Text('BEST — Smooth Premium'),
+              ),
+              PopupMenuItem(
+                value: HomeVisualVariant.contrastBug,
+                child: Text('BUG — LỖI-CONTRAST-01'),
+              ),
+            ],
+          ),
           IconButton(
             onPressed: () async {
               await context.read<LoginViewModel>().logout();
@@ -63,26 +83,21 @@ class _HomePageState extends State<HomePage> {
           child: const Icon(Icons.add),
         ),
       ),
-      body: Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          color: TetColors.bgMain,
+          gradient: isBugVariant ? TetGradients.softBg : null,
+        ),
         child: selectedYear == null
             ? const Center(child: Text('Chưa có dữ liệu năm, vui lòng tạo năm mới.'))
             : ListView(
                 padding: const EdgeInsets.all(TetSpacing.s5),
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(TetSpacing.s6),
-                    decoration: BoxDecoration(
-                      gradient: TetGradients.tet,
-                      borderRadius: BorderRadius.circular(TetRadius.lg),
-                    ),
-                    child: Text(
-                      'Chúc mừng năm mới! Theo dõi ngân sách Tết thông minh ✨',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white),
-                    ),
-                  ),
+                  _buildVariantBanner(isBugVariant),
                   const SizedBox(height: TetSpacing.s3),
-                  _buildYearBudgetCard(context, vm, selectedYear),
+                  _buildYearBudgetCard(context, vm, selectedYear, isBugVariant),
+                  const SizedBox(height: TetSpacing.s4),
+                  _buildQuickActions(context, selectedYear),
                   const SizedBox(height: TetSpacing.s4),
                   _buildDonutCard(vm, selectedYear),
                   const SizedBox(height: TetSpacing.s4),
@@ -93,12 +108,43 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildYearBudgetCard(BuildContext context, TetBudgetViewModel vm, TetYear year) {
+  Widget _buildVariantBanner(bool isBugVariant) {
+    final textColor = isBugVariant ? TetColors.textPrimaryBug : Colors.white;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      padding: const EdgeInsets.all(TetSpacing.s5),
+      decoration: BoxDecoration(
+        gradient: isBugVariant ? TetGradients.softBg : TetGradients.tet,
+        borderRadius: BorderRadius.circular(TetRadius.lg),
+        boxShadow: TetShadows.sm,
+      ),
+      child: Text(
+        isBugVariant
+            ? 'BUG demo: chữ tối trên nền gradient nhạt (LỖI-CONTRAST-01)'
+            : 'Smooth Premium v1.1 • theo dõi ngân sách Tết thanh thoát ✨',
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: textColor,
+              fontWeight: FontWeight.w600,
+            ),
+      ),
+    );
+  }
+
+  Widget _buildYearBudgetCard(
+    BuildContext context,
+    TetBudgetViewModel vm,
+    TetYear year,
+    bool isBugVariant,
+  ) {
     final spent = vm.spentByYear(year.id);
     final ratio = year.totalBudget == 0 ? 0.0 : spent / year.totalBudget;
     final overSpent = spent > year.totalBudget;
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
       decoration: BoxDecoration(
         gradient: TetGradients.wallet,
         borderRadius: BorderRadius.circular(TetRadius.xl),
@@ -113,7 +159,7 @@ class _HomePageState extends State<HomePage> {
           );
         },
         child: Padding(
-          padding: const EdgeInsets.all(TetSpacing.s6),
+          padding: const EdgeInsets.all(TetSpacing.s5),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -122,6 +168,7 @@ class _HomePageState extends State<HomePage> {
                 dropdownColor: Colors.white,
                 style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
                 decoration: const InputDecoration(
+                  isDense: true,
                   labelText: 'Năm ngân sách',
                   labelStyle: TextStyle(color: Colors.white),
                 ),
@@ -133,20 +180,36 @@ class _HomePageState extends State<HomePage> {
                     .toList(),
                 onChanged: (value) => vm.selectYear(value),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: TetSpacing.s4),
               Text(
-                '${formatMoney(spent)} / ${formatMoney(year.totalBudget)} VND',
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white),
+                formatMoney(spent),
+                style: const TextStyle(
+                  fontSize: 34,
+                  height: 1.1,
+                  letterSpacing: -0.68,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
               ),
-              const SizedBox(height: 8),
-              LinearProgressIndicator(
-                value: ratio.isFinite ? ratio.clamp(0, 1) : 0,
-                minHeight: 8,
+              const SizedBox(height: TetSpacing.s1),
+              Text(
+                'Ngân sách: ${formatMoney(year.totalBudget)} VND',
+                style: TextStyle(
+                  color: isBugVariant ? TetColors.textPrimaryBug : Colors.white.withValues(alpha: 0.92),
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: TetSpacing.s3),
+              ClipRRect(
                 borderRadius: BorderRadius.circular(TetRadius.full),
-                backgroundColor: Colors.white24,
-                color: overSpent ? TetColors.danger : TetColors.accentGold,
+                child: LinearProgressIndicator(
+                  value: ratio.isFinite ? ratio.clamp(0, 1) : 0,
+                  minHeight: 8,
+                  backgroundColor: Colors.white24,
+                  color: overSpent ? TetColors.danger : TetColors.accentGold,
+                ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: TetSpacing.s2),
               Text(
                 'Đã dùng ${(ratio * 100).toStringAsFixed(0)}%${overSpent ? ' • Vượt ngân sách!' : ''}',
                 style: TextStyle(color: overSpent ? Colors.red.shade100 : Colors.white),
@@ -155,6 +218,47 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context, TetYear year) {
+    final actions = [
+      (Icons.add_card_rounded, 'Thêm mục', () => _showCategoryDialog(context, year)),
+      (Icons.receipt_long_rounded, 'Báo cáo', () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => YearDetailPage(yearId: year.id)));
+      }),
+      (Icons.calendar_month_rounded, 'Năm', () => _showYearDialog(context)),
+    ];
+
+    return Row(
+      children: actions
+          .map(
+            (item) => Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(TetRadius.lg),
+                  onTap: item.$3,
+                  child: Ink(
+                    padding: const EdgeInsets.symmetric(vertical: TetSpacing.s3),
+                    decoration: BoxDecoration(
+                      color: TetColors.bgCard,
+                      borderRadius: BorderRadius.circular(TetRadius.lg),
+                      border: Border.all(color: TetColors.border),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(item.$1, color: TetColors.primary500, size: 20),
+                        const SizedBox(height: TetSpacing.s1),
+                        Text(item.$2, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 
