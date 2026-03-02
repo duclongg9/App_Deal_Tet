@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Tết Wallet Design Tokens v1.0
+/// Tết Wallet Design Tokens v1.1
 abstract final class TetColors {
   static const primary500 = Color(0xFF6C63FF);
   static const primary600 = Color(0xFF5A52E0);
@@ -8,12 +8,15 @@ abstract final class TetColors {
   static const success = Color(0xFF22C55E);
   static const danger = Color(0xFFEF4444);
 
-  static const bgMain = Color(0xFFF7F8FA);
+  static const bgMain = Color(0xFFFBFBFD);
   static const bgCard = Color(0xFFFFFFFF);
   static const border = Color(0xFFE5E7EB);
-  static const textPrimary = Color(0xFF111827);
+  static const textPrimary = Color(0xFF0F172A);
   static const textSecondary = Color(0xFF6B7280);
   static const textMuted = Color(0xFF9CA3AF);
+
+  // Demo bug token: poor text contrast over soft gradient backgrounds.
+  static const textPrimaryBug = Color(0xFF1F2937);
 
   static const darkBgMain = Color(0xFF0F172A);
   static const darkBgCard = Color(0xFF1E293B);
@@ -37,6 +40,12 @@ abstract final class TetGradients {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [Color(0xFFF9A826), Color(0xFFFFB703)],
+  );
+
+  static const softBg = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFFFFF6F6), Color(0xFFFFF1F2)],
   );
 }
 
