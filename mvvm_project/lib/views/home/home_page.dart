@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:mvvm_project/design_system/tet_design_tokens.dart';
 import 'package:mvvm_project/domain/entities/tet_models.dart';
 import 'package:mvvm_project/viewmodels/login/login_viewmodel.dart';
 import 'package:mvvm_project/viewmodels/tet/tet_budget_viewmodel.dart';
@@ -48,38 +49,43 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _showYearDialog(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Tạo Năm Mới'),
+        elevation: 0,
+        child: Ink(
+          width: 56,
+          height: 56,
+          decoration: const BoxDecoration(
+            gradient: TetGradients.wallet,
+            shape: BoxShape.circle,
+            boxShadow: TetShadows.lg,
+          ),
+          child: const Icon(Icons.add),
+        ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFFFF3E0), Color(0xFFFFFDF8)],
-          ),
-        ),
+        color: Theme.of(context).scaffoldBackgroundColor,
         child: selectedYear == null
             ? const Center(child: Text('Chưa có dữ liệu năm, vui lòng tạo năm mới.'))
             : ListView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(TetSpacing.s5),
                 children: [
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        'Chúc mừng năm mới! Theo dõi ngân sách Tết thông minh ✨',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
+                  Container(
+                    padding: const EdgeInsets.all(TetSpacing.s6),
+                    decoration: BoxDecoration(
+                      gradient: TetGradients.tet,
+                      borderRadius: BorderRadius.circular(TetRadius.lg),
+                    ),
+                    child: Text(
+                      'Chúc mừng năm mới! Theo dõi ngân sách Tết thông minh ✨',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: TetSpacing.s3),
                   _buildYearBudgetCard(context, vm, selectedYear),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: TetSpacing.s4),
                   _buildDonutCard(vm, selectedYear),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: TetSpacing.s4),
                   _buildRecentHistory(context, vm, selectedYear),
                 ],
               ),
@@ -92,9 +98,14 @@ class _HomePageState extends State<HomePage> {
     final ratio = year.totalBudget == 0 ? 0.0 : spent / year.totalBudget;
     final overSpent = spent > year.totalBudget;
 
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        gradient: TetGradients.wallet,
+        borderRadius: BorderRadius.circular(TetRadius.xl),
+        boxShadow: TetShadows.md,
+      ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(TetRadius.xl),
         onTap: () {
           Navigator.push(
             context,
@@ -102,13 +113,18 @@ class _HomePageState extends State<HomePage> {
           );
         },
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(TetSpacing.s6),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DropdownButtonFormField<String>(
                 value: year.id,
-                decoration: const InputDecoration(labelText: 'Năm ngân sách'),
+                dropdownColor: Colors.white,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                decoration: const InputDecoration(
+                  labelText: 'Năm ngân sách',
+                  labelStyle: TextStyle(color: Colors.white),
+                ),
                 items: vm.years
                     .map((item) => DropdownMenuItem(
                           value: item.id,
@@ -120,18 +136,20 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 12),
               Text(
                 '${formatMoney(spent)} / ${formatMoney(year.totalBudget)} VND',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white),
               ),
               const SizedBox(height: 8),
               LinearProgressIndicator(
                 value: ratio.isFinite ? ratio.clamp(0, 1) : 0,
-                minHeight: 10,
-                color: overSpent ? Colors.red : null,
+                minHeight: 8,
+                borderRadius: BorderRadius.circular(TetRadius.full),
+                backgroundColor: Colors.white24,
+                color: overSpent ? TetColors.danger : TetColors.accentGold,
               ),
               const SizedBox(height: 8),
               Text(
                 'Đã dùng ${(ratio * 100).toStringAsFixed(0)}%${overSpent ? ' • Vượt ngân sách!' : ''}',
-                style: TextStyle(color: overSpent ? Colors.red : Colors.black87),
+                style: TextStyle(color: overSpent ? Colors.red.shade100 : Colors.white),
               ),
             ],
           ),
@@ -151,7 +169,7 @@ class _HomePageState extends State<HomePage> {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(TetSpacing.s5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -209,7 +227,7 @@ class _HomePageState extends State<HomePage> {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(TetSpacing.s5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
