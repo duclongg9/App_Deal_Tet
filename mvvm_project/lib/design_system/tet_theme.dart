@@ -75,8 +75,21 @@ abstract final class TetTheme {
   }
 
   static ThemeData dark() {
+    const scheme = ColorScheme(
+      brightness: Brightness.dark,
+      primary: TetColors.primary500,
+      onPrimary: Colors.white,
+      secondary: TetColors.accentGold,
+      onSecondary: TetColors.darkTextPrimary,
+      error: TetColors.danger,
+      onError: Colors.white,
+      surface: TetColors.darkBgCard,
+      onSurface: TetColors.darkTextPrimary,
+    );
+
     final base = light();
     return base.copyWith(
+      colorScheme: scheme,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: TetColors.darkBgMain,
       cardTheme: base.cardTheme.copyWith(
@@ -89,6 +102,23 @@ abstract final class TetTheme {
       textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme).apply(
         bodyColor: TetColors.darkTextPrimary,
         displayColor: TetColors.darkTextPrimary,
+      ),
+      inputDecorationTheme: base.inputDecorationTheme.copyWith(
+        fillColor: TetColors.darkBgCard,
+        hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+        labelStyle: const TextStyle(color: Color(0xFFCBD5E1)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(TetRadius.md),
+          borderSide: const BorderSide(color: Color(0xFF334155)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(TetRadius.md),
+          borderSide: const BorderSide(color: Color(0xFF334155)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(TetRadius.md),
+          borderSide: const BorderSide(color: TetColors.primary500, width: 1.2),
+        ),
       ),
     );
   }

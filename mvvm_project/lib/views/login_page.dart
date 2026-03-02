@@ -26,6 +26,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<LoginViewModel>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       body: Container(
@@ -50,14 +51,14 @@ class _LoginPageState extends State<LoginPage> {
                       Text(
                         'Đăng nhập để quản lý chi tiêu Tết thông minh',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey.shade700),
+                        style: TextStyle(color: isDark ? Colors.white70 : Colors.grey.shade700),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Tài khoản mẫu: admin / FU@2026 hoặc longpham / 12345',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.grey.shade600,
+                          color: isDark ? Colors.white60 : Colors.grey.shade600,
                           fontSize: 13,
                         ),
                       ),
