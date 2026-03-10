@@ -7,6 +7,8 @@ import 'package:mvvm_project/views/usermangement/user_management_header.dart';
 import 'package:mvvm_project/views/usermangement/user_management_page.dart';
 import 'package:provider/provider.dart';
 
+import '../api_images/api_images_page.dart';
+
 class AdminHomePage extends StatelessWidget {
   final String userName;
 
@@ -62,7 +64,14 @@ class AdminHomePage extends StatelessWidget {
                     icon: Icons.image,
                     title: 'Xem ảnh qua API',
                     iconColor: const Color(0xFF42A5F5),
-                    onTap: () => _showSoon(context),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ApiImagesPage(),
+                        ),
+                      );
+                    },
                   ),
                   HomeMenuButton(
                     icon: Icons.flutter_dash,
