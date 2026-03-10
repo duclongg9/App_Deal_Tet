@@ -22,8 +22,19 @@ void _configureDatabaseFactory() {
     return;
   }
 
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
+  switch (defaultTargetPlatform) {
+    case TargetPlatform.windows:
+    case TargetPlatform.linux:
+    case TargetPlatform.macOS:
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+      break;
+    case TargetPlatform.android:
+    case TargetPlatform.iOS:
+    case TargetPlatform.fuchsia:
+      // Keep the default sqflite implementation on mobile platforms.
+      break;
+  }
 }
 
 class MyApp extends StatelessWidget {
