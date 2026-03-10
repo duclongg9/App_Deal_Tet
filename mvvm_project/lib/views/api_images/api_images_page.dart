@@ -12,28 +12,86 @@ class _ApiImagesPageState extends State<ApiImagesPage>
   late final TabController _tabController;
 
   final List<int> _codes = const [
-    100, 101, 200, 201, 202, 204,
-    301, 302, 304,
-    400, 401, 403, 404, 405, 408, 409, 418, 429,
-    500, 501, 502, 503, 504,
+    100,
+    101,
+    200,
+    201,
+    202,
+    204,
+    301,
+    302,
+    304,
+    400,
+    401,
+    403,
+    404,
+    405,
+    408,
+    409,
+    418,
+    429,
+    500,
+    501,
+    502,
+    503,
+    504,
   ];
 
   int _selected = 404;
+  int _imageAttempt = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) return;
+      _resetImageAttempt();
+    });
   }
 
-  String _imageUrl() {
-    final idx = _tabController.index;
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
-    if (idx == 0) {
-      return 'https://http.cat/$_selected.jpg';
+  List<String> _imageCandidates() {
+    final isCat = _tabController.index == 0;
+    if (isCat) {
+      return [
+        'https://http.cat/$_selected.jpg',
+        'https://http.cat/$_selected',
+      ];
     }
 
-    return 'https://http.dog/$_selected.jpg';
+    return [
+      'https://http.dog/$_selected.jpg',
+      'https://http.dog/$_selected',
+    ];
+  }
+
+  String _activeImageUrl() {
+    final candidates = _imageCandidates();
+    if (_imageAttempt < candidates.length) {
+      return candidates[_imageAttempt];
+    }
+    return candidates.last;
+  }
+
+  void _resetImageAttempt() {
+    if (!mounted) return;
+    setState(() => _imageAttempt = 0);
+  }
+
+  void _useNextImageCandidate() {
+    final candidates = _imageCandidates();
+    if (_imageAttempt >= candidates.length - 1) {
+      return;
+    }
+
+    if (!mounted) return;
+    setState(() => _imageAttempt += 1);
   }
 
   @override
@@ -41,6 +99,7 @@ class _ApiImagesPageState extends State<ApiImagesPage>
     const bgColor = Color(0xFFF5F5F5);
     const headerBlue = Color(0xFF007AFF);
     const primary = Color(0xFF212121);
+    final imageUrl = _activeImageUrl();
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -51,7 +110,7 @@ class _ApiImagesPageState extends State<ApiImagesPage>
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,
-          onTap: (_) => setState(() {}), // refresh url
+          onTap: (_) => _resetImageAttempt(),
           tabs: const [
             Tab(text: 'Cat'),
             Tab(text: 'Dog'),
@@ -62,7 +121,6 @@ class _ApiImagesPageState extends State<ApiImagesPage>
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            /// Dropdown chọn code
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14),
               decoration: BoxDecoration(
@@ -84,26 +142,28 @@ class _ApiImagesPageState extends State<ApiImagesPage>
                   items: _codes
                       .map(
                         (c) => DropdownMenuItem(
-                      value: c,
-                      child: Text(
-                        'HTTP $c',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                          value: c,
+                          child: Text(
+                            'HTTP $c',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  )
+                      )
                       .toList(),
-                  onChanged: (value) =>
-                      setState(() => _selected = value!),
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() {
+                      _selected = value;
+                      _imageAttempt = 0;
+                    });
+                  },
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-            /// Image viewer
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -123,22 +183,21 @@ class _ApiImagesPageState extends State<ApiImagesPage>
                 child: Column(
                   children: [
                     Text(
-                      _imageUrl(),
+                      imageUrl,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.black.withOpacity(0.5),
                       ),
                     ),
-
                     const SizedBox(height: 16),
-
                     Expanded(
                       child: InteractiveViewer(
                         minScale: 0.8,
                         maxScale: 3.0,
                         child: Image.network(
-                          _imageUrl(),
+                          imageUrl,
+                          key: ValueKey(imageUrl),
                           fit: BoxFit.contain,
                           loadingBuilder: (context, widget, progress) {
                             if (progress == null) return widget;
@@ -147,9 +206,21 @@ class _ApiImagesPageState extends State<ApiImagesPage>
                             );
                           },
                           errorBuilder: (context, error, stackTrace) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              _useNextImageCandidate();
+                            });
+
+                            final isLastTry =
+                                _imageAttempt >= _imageCandidates().length - 1;
+                            if (!isLastTry) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+
                             return Center(
                               child: Text(
-                                'Lỗi tải ảnh',
+                                'Lỗi tải ảnh\nVui lòng thử mã HTTP khác.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: primary.withOpacity(0.85),
