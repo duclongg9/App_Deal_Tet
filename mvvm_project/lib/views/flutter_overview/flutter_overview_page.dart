@@ -341,40 +341,155 @@ class FlutterTheoryDetailPage extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              topic.gradient.first.withOpacity(0.12),
-              const Color(0xFFF8FAFC),
+              topic.gradient.first.withOpacity(0.18),
+              const Color(0xFFEFF6FF),
+              Colors.white,
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 18, 16, 26),
           children: [
             Container(
-              padding: const EdgeInsets.all(18),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                gradient: LinearGradient(
+                  colors: [topic.gradient.first, topic.gradient.last],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: topic.gradient.last.withOpacity(0.35),
+                    blurRadius: 18,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.22),
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Icon(topic.icon, color: Colors.white, size: 30),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: const Text(
+                          'Lý thuyết cốt lõi',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    topic.summary,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      height: 1.45,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: const [
+                      _QuickInfo(icon: Icons.schedule_rounded, label: '5 phút'),
+                      SizedBox(width: 10),
+                      _QuickInfo(icon: Icons.auto_awesome_rounded, label: 'Dễ hiểu'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: const Color(0xFFD8E4FF)),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x140F172A),
+                    blurRadius: 20,
+                    offset: Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Nội dung chính',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 20,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Tóm tắt các ý quan trọng để bạn nắm nhanh phần ${topic.title}.',
+                    style: const TextStyle(
+                      color: Color(0xFF475569),
+                      fontSize: 14,
+                      height: 1.35,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ...List.generate(
+                    topic.bullets.length,
+                    (index) => _TheoryPointCard(
+                      index: index,
+                      content: topic.bullets[index],
+                      gradient: topic.gradient,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                gradient: LinearGradient(colors: topic.gradient),
+                color: topic.gradient.first.withOpacity(0.08),
+                border: Border.all(color: topic.gradient.first.withOpacity(0.16)),
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 54,
-                    height: 54,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.22),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Icon(topic.icon, color: Colors.white, size: 30),
-                  ),
-                  const SizedBox(width: 12),
+                  Icon(Icons.tips_and_updates_rounded,
+                      color: topic.gradient.last, size: 24),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      topic.summary,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
+                      'Mẹo học nhanh: đọc 1 lượt phần lý thuyết, sau đó tự code lại 1 ví dụ nhỏ theo chủ đề ${topic.title} để ghi nhớ lâu hơn.',
+                      style: TextStyle(
+                        color: const Color(0xFF1E293B),
+                        fontSize: 14,
                         height: 1.45,
                         fontWeight: FontWeight.w600,
                       ),
@@ -383,44 +498,95 @@ class FlutterTheoryDetailPage extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 14),
-            ...topic.bullets.map(
-              (item) => Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                decoration: BoxDecoration(
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _QuickInfo extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _QuickInfo({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.16),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 16),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TheoryPointCard extends StatelessWidget {
+  final int index;
+  final String content;
+  final List<Color> gradient;
+
+  const _TheoryPointCard({
+    required this.index,
+    required this.content,
+    required this.gradient,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 28,
+              height: 28,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: gradient),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '${index + 1}',
+                style: const TextStyle(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x110F172A),
-                      blurRadius: 12,
-                      offset: Offset(0, 6),
-                    ),
-                  ],
+                  fontWeight: FontWeight.w800,
                 ),
-                child: ListTile(
-                  leading: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(colors: topic.gradient),
-                    ),
-                    child: const Icon(
-                      Icons.check,
-                      size: 18,
-                      color: Colors.white,
-                    ),
-                  ),
-                  title: Text(
-                    item,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      height: 1.35,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                content,
+                style: const TextStyle(
+                  fontSize: 15,
+                  height: 1.4,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF334155),
                 ),
               ),
             ),
