@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+const summaryStyle = TextStyle(
+  fontSize: 18,
+  height: 1.4,
+  fontWeight: FontWeight.w600,
+  color: Color(0xFF37474F),
+);
+
 class FlutterTheoryTopic {
   final String title;
   final String summary;
@@ -117,10 +124,10 @@ class FlutterOverviewPage extends StatelessWidget {
             ),
             child: const Text(
               'Flutter là framework UI đa nền tảng dùng Dart. '
-              'Bạn có thể build app Android/iOS/Web/Desktop từ 1 codebase.\n\n'
-              'Bên dưới là các chủ đề cốt lõi cùng nội dung lý thuyết '
-              'để bạn học nhanh và hệ thống.',
-              style: TextStyle(fontSize: 18, height: 1.4, fontWeight: FontWeight.w600),
+                  'Bạn có thể build app Android/iOS/Web/Desktop từ 1 codebase.\n\n'
+                  'Bên dưới là các chủ đề cốt lõi cùng nội dung lý thuyết '
+                  'để bạn học nhanh và hệ thống.',
+              style: summaryStyle,
             ),
           ),
           const SizedBox(height: 12),
@@ -181,11 +188,7 @@ class _TopicCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       topic.summary,
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.grey.shade700,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: summaryStyle,
                     ),
                   ],
                 ),
@@ -223,17 +226,20 @@ class FlutterTheoryDetailPage extends StatelessWidget {
             ),
             child: Text(
               topic.summary,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              style: summaryStyle,
             ),
           ),
           const SizedBox(height: 12),
           ...topic.bullets.map(
-            (item) => Card(
+                (item) => Card(
               elevation: 0,
               margin: const EdgeInsets.only(bottom: 10),
               child: ListTile(
                 leading: const Icon(Icons.check_circle, color: Color(0xFF1E88E5)),
-                title: Text(item, style: const TextStyle(fontSize: 16, height: 1.35)),
+                title: Text(
+                  item,
+                  style: const TextStyle(fontSize: 16, height: 1.35),
+                ),
               ),
             ),
           ),
