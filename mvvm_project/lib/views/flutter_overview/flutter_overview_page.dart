@@ -27,79 +27,85 @@ class FlutterOverviewPage extends StatelessWidget {
   static const List<FlutterTheoryTopic> _topics = [
     FlutterTheoryTopic(
       title: 'Widget',
-      summary: 'Mọi thứ trong Flutter đều là Widget.',
+      summary: 'Stateless/Stateful, build(), lifecycle',
       icon: Icons.widgets,
       bullets: [
-        'StatelessWidget dùng cho UI không thay đổi theo trạng thái.',
-        'StatefulWidget dùng khi giao diện cần cập nhật dữ liệu động.',
-        'Hàm build() được gọi lại khi state thay đổi để vẽ lại giao diện.',
-        'Lifecycle cơ bản: createState → initState → build → dispose.',
+        'StatelessWidget dùng khi UI không thay đổi.',
+        'StatefulWidget dùng khi UI cần cập nhật.',
+        'build() được gọi lại khi state thay đổi.',
+        'Lifecycle: initState → build → dispose.',
       ],
     ),
+
     FlutterTheoryTopic(
       title: 'Layout',
-      summary: 'Sắp xếp UI bằng các widget bố cục linh hoạt.',
-      icon: Icons.dashboard_customize,
+      summary: 'Row/Column/Flex, Stack, GridView',
+      icon: Icons.grid_view,
       bullets: [
-        'Row và Column để xếp phần tử theo chiều ngang hoặc dọc.',
-        'Expanded/Flexible để chia tỷ lệ không gian trong Row/Column.',
-        'Stack để chồng nhiều lớp giao diện lên nhau.',
-        'GridView phù hợp danh sách dạng lưới (ảnh, sản phẩm, thẻ).',
+        'Row và Column sắp xếp widget.',
+        'Expanded/Flexible chia tỷ lệ.',
+        'Stack để chồng UI.',
+        'GridView cho layout dạng lưới.',
       ],
     ),
+
     FlutterTheoryTopic(
       title: 'Navigation',
-      summary: 'Điều hướng giữa các màn hình bằng Navigator.',
+      summary: 'Navigator 1.0 / Named routes',
       icon: Icons.alt_route,
       bullets: [
-        'Navigator.push() mở màn hình mới trên stack.',
-        'Navigator.pop() quay về màn hình trước đó.',
-        'Named routes giúp quản lý route tập trung, dễ bảo trì.',
-        'Có thể truyền dữ liệu qua constructor hoặc arguments khi điều hướng.',
+        'Navigator.push mở trang.',
+        'Navigator.pop quay lại.',
+        'Named routes quản lý route.',
+        'Có thể truyền dữ liệu giữa page.',
       ],
     ),
+
     FlutterTheoryTopic(
       title: 'State',
-      summary: 'Quản lý trạng thái để UI luôn đồng bộ dữ liệu.',
+      summary: 'setState, Provider (ChangeNotifier)',
       icon: Icons.sync_alt,
       bullets: [
-        'setState() phù hợp bài toán nhỏ, cập nhật nhanh trong 1 widget.',
-        'ChangeNotifier + Provider phù hợp app vừa/lớn, tách UI và logic.',
-        'State nên đặt gần nơi sử dụng để giảm rebuild không cần thiết.',
-        'MVVM thường kết hợp Provider để quản lý state rõ ràng.',
+        'setState cho widget đơn giản.',
+        'Provider cho app lớn.',
+        'State nên đặt gần UI sử dụng.',
+        'MVVM thường kết hợp Provider.',
       ],
     ),
+
     FlutterTheoryTopic(
       title: 'Networking',
-      summary: 'Lấy dữ liệu từ server qua HTTP/REST API.',
+      summary: 'HTTP, REST API, JSON',
       icon: Icons.cloud_download,
       bullets: [
-        'Dùng package http hoặc dio để gọi API GET/POST/PUT/DELETE.',
-        'JSON được parse thành model để dùng an toàn trong Dart.',
-        'Cần xử lý loading, error, timeout để UX tốt hơn.',
-        'Tách lớp service/repository giúp code dễ test và mở rộng.',
+        'Dùng package http gọi API.',
+        'REST API phổ biến trong mobile.',
+        'JSON để trao đổi dữ liệu.',
+        'FutureBuilder hiển thị dữ liệu async.',
       ],
     ),
+
     FlutterTheoryTopic(
       title: 'Local DB',
-      summary: 'Lưu dữ liệu cục bộ để dùng offline.',
+      summary: 'SQLite (sqflite), SharedPreferences',
       icon: Icons.storage,
       bullets: [
-        'SharedPreferences dùng cho dữ liệu key-value nhỏ (token, setting).',
-        'SQLite/sqflite phù hợp dữ liệu có cấu trúc dạng bảng.',
-        'Nên đồng bộ local và server theo chiến lược cache rõ ràng.',
-        'Đóng kết nối và chuẩn hóa thao tác DB để tăng hiệu năng.',
+        'sqflite lưu dữ liệu dạng bảng.',
+        'SharedPreferences lưu key-value.',
+        'Dùng cho cache dữ liệu.',
+        'Tăng tốc load app.',
       ],
     ),
+
     FlutterTheoryTopic(
       title: 'UI/UX',
-      summary: 'Thiết kế đẹp, dễ dùng và nhất quán trải nghiệm.',
+      summary: 'Theme, Material 3, responsive',
       icon: Icons.palette,
       bullets: [
-        'Dùng ThemeData để thống nhất màu sắc, font, button toàn app.',
-        'Material 3 giúp giao diện hiện đại và đồng bộ với Android mới.',
-        'Thiết kế responsive để hiển thị tốt trên nhiều kích thước màn hình.',
-        'Ưu tiên khả năng đọc, tương phản màu và phản hồi thao tác rõ ràng.',
+        'Material 3 là design system mới.',
+        'Theme giúp đồng bộ màu.',
+        'Responsive cho nhiều màn hình.',
+        'MediaQuery giúp scale UI.',
       ],
     ),
   ];
@@ -123,10 +129,9 @@ class FlutterOverviewPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Text(
-              'Flutter là framework UI đa nền tảng dùng Dart. '
-                  'Bạn có thể build app Android/iOS/Web/Desktop từ 1 codebase.\n\n'
-                  'Bên dưới là các chủ đề cốt lõi cùng nội dung lý thuyết '
-                  'để bạn học nhanh và hệ thống.',
+              'Flutter là framework UI đa nền tảng dùng Dart.\n\n'
+                  'Bạn có thể build Android, iOS, Web và Desktop '
+                  'từ một codebase duy nhất.',
               style: summaryStyle,
             ),
           ),
@@ -154,6 +159,7 @@ class _TopicCard extends StatelessWidget {
         side: BorderSide(color: Colors.grey.shade200),
       ),
       child: InkWell(
+        borderRadius: BorderRadius.circular(24),
         onTap: () {
           Navigator.push(
             context,
@@ -162,7 +168,6 @@ class _TopicCard extends StatelessWidget {
             ),
           );
         },
-        borderRadius: BorderRadius.circular(24),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           child: Row(
@@ -186,10 +191,7 @@ class _TopicCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      topic.summary,
-                      style: summaryStyle,
-                    ),
+                    Text(topic.summary, style: summaryStyle),
                   ],
                 ),
               ),
@@ -216,11 +218,11 @@ class FlutterTheoryDetailPage extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              topic.gradient.first.withOpacity(0.18),
-              const Color(0xFFEFF6FF),
+              Color(0xFFEAF3FF),
+              Color(0xFFF8FBFF),
               Colors.white,
             ],
             begin: Alignment.topCenter,
@@ -228,152 +230,56 @@ class FlutterTheoryDetailPage extends StatelessWidget {
           ),
         ),
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 18, 16, 26),
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
           children: [
+
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(28),
-                gradient: LinearGradient(
-                  colors: [topic.gradient.first, topic.gradient.last],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                borderRadius: BorderRadius.circular(24),
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFF1E88E5),
+                    Color(0xFF1565C0),
+                  ],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: topic.gradient.last.withOpacity(0.35),
-                    blurRadius: 18,
-                    offset: const Offset(0, 12),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 56,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.22),
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: Icon(topic.icon, color: Colors.white, size: 30),
-                      ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: const Text(
-                          'Lý thuyết cốt lõi',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    topic.summary,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      height: 1.45,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: const [
-                      _QuickInfo(icon: Icons.schedule_rounded, label: '5 phút'),
-                      SizedBox(width: 10),
-                      _QuickInfo(icon: Icons.auto_awesome_rounded, label: 'Dễ hiểu'),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: const Color(0xFFD8E4FF)),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x140F172A),
-                    blurRadius: 20,
-                    offset: Offset(0, 12),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Nội dung chính',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 20,
-                      color: Color(0xFF0F172A),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Tóm tắt các ý quan trọng để bạn nắm nhanh phần ${topic.title}.',
-                    style: const TextStyle(
-                      color: Color(0xFF475569),
-                      fontSize: 14,
-                      height: 1.35,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  ...List.generate(
-                    topic.bullets.length,
-                    (index) => _TheoryPointCard(
-                      index: index,
-                      content: topic.bullets[index],
-                      gradient: topic.gradient,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: topic.gradient.first.withOpacity(0.08),
-                border: Border.all(color: topic.gradient.first.withOpacity(0.16)),
               ),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.tips_and_updates_rounded,
-                      color: topic.gradient.last, size: 24),
-                  const SizedBox(width: 10),
+                  Icon(topic.icon, color: Colors.white, size: 28),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Mẹo học nhanh: đọc 1 lượt phần lý thuyết, sau đó tự code lại 1 ví dụ nhỏ theo chủ đề ${topic.title} để ghi nhớ lâu hơn.',
-                      style: TextStyle(
-                        color: const Color(0xFF1E293B),
-                        fontSize: 14,
+                      topic.summary,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
                         height: 1.45,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                 ],
+              ),
+            ),
+
+            const SizedBox(height: 18),
+
+            const Text(
+              "Nội dung chính",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            ...List.generate(
+              topic.bullets.length,
+                  (index) => _TheoryPointCard(
+                index: index,
+                content: topic.bullets[index],
               ),
             ),
           ],
@@ -383,89 +289,53 @@ class FlutterTheoryDetailPage extends StatelessWidget {
   }
 }
 
-class _QuickInfo extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _QuickInfo({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.16),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white, size: 16),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _TheoryPointCard extends StatelessWidget {
   final int index;
   final String content;
-  final List<Color> gradient;
 
   const _TheoryPointCard({
     required this.index,
     required this.content,
-    required this.gradient,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 28,
-              height: 28,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: gradient),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                '${index + 1}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E88E5),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              "${index + 1}",
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
               ),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                content,
-                style: const TextStyle(
-                  fontSize: 15,
-                  height: 1.4,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF334155),
-                ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              content,
+              style: const TextStyle(
+                fontSize: 15,
+                height: 1.4,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF334155),
               ),
             ),
           ),
