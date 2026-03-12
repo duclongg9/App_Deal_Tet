@@ -8,6 +8,7 @@ import 'package:mvvm_project/views/usermangement/user_management_page.dart';
 import 'package:provider/provider.dart';
 
 import '../api_images/api_images_page.dart';
+import '../flutter_overview/flutter_overview_page.dart';
 
 class AdminHomePage extends StatelessWidget {
   final String userName;
@@ -77,7 +78,14 @@ class AdminHomePage extends StatelessWidget {
                     icon: Icons.flutter_dash,
                     title: 'Tổng quan Flutter',
                     iconColor: const Color(0xFF1E88E5),
-                    onTap: () => _showSoon(context),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const FlutterOverviewPage(),
+                        ),
+                      );
+                    },
                   ),
                   HomeMenuButton(
                     icon: Icons.power_settings_new,
