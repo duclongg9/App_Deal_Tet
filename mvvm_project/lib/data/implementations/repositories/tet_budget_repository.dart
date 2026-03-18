@@ -22,6 +22,12 @@ class TetBudgetRepository implements ITetBudgetRepository {
   }
 
   @override
+  Future<TetYear> updateYear({required String yearId, required int totalBudget}) async {
+    final dto = await api.updateYear(yearId: yearId, totalBudget: totalBudget);
+    return mapper.toYear(dto);
+  }
+
+  @override
   Future<TetCategory> createCategory({
     required String yearId,
     required String name,

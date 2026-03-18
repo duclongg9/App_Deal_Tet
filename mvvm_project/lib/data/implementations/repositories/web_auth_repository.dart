@@ -1,3 +1,4 @@
+import 'package:mvvm_project/data/dtos/login/user_dto.dart';
 import 'package:mvvm_project/data/interfaces/repositories/iauth_repository.dart';
 import 'package:mvvm_project/domain/entities/auth_session.dart';
 import 'package:mvvm_project/domain/entities/user.dart';
@@ -34,6 +35,17 @@ class WebAuthRepository implements IAuthRepository {
   @override
   Future<void> logout() async {
     _session = null;
+  }
+
+  @override
+  Future<UserDto> signInWithGoogle() async {
+    // For web/mock purposes, we can return a default user or throw UnimplementedError
+    // if you don't want to support it here.
+    return const UserDto(
+      id: 'web-google-id',
+      userName: 'Web Google User',
+      role: 'user',
+    );
   }
 }
 

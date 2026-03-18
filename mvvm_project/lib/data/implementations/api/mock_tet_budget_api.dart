@@ -28,6 +28,16 @@ class MockTetBudgetApi implements ITetBudgetApi {
   }
 
   @override
+  Future<TetYearDto> updateYear({required String yearId, required int totalBudget}) async {
+    final idx = _years.indexWhere((e) => e.id == yearId);
+    if (idx < 0) throw Exception('Không tìm thấy năm.');
+    final old = _years[idx];
+    final item = TetYearDto(id: old.id, year: old.year, totalBudget: totalBudget);
+    _years[idx] = item;
+    return item;
+  }
+
+  @override
   Future<TetCategoryDto> createCategory({
     required String yearId,
     required String name,

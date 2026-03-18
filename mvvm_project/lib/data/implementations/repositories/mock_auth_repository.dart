@@ -1,3 +1,4 @@
+import 'package:mvvm_project/data/dtos/login/user_dto.dart';
 import 'package:mvvm_project/data/interfaces/repositories/iauth_repository.dart';
 import 'package:mvvm_project/domain/entities/auth_session.dart';
 import 'package:mvvm_project/domain/entities/user.dart';
@@ -17,4 +18,13 @@ class MockAuthRepository implements IAuthRepository {
 
   @override
   Future<void> logout() async {}
+
+  @override
+  Future<UserDto> signInWithGoogle() async {
+    return const UserDto(
+      id: 'mock-google-id',
+      userName: 'Mock Google User',
+      role: 'user',
+    );
+  }
 }

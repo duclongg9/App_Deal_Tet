@@ -2,50 +2,62 @@ import 'package:flutter/material.dart';
 
 /// Tết Wallet Design Tokens v1.1
 abstract final class TetColors {
-  static const primary500 = Color(0xFF6C63FF);
-  static const primary600 = Color(0xFF5A52E0);
-  static const accentGold = Color(0xFFF9A826);
-  static const success = Color(0xFF22C55E);
-  static const danger = Color(0xFFEF4444);
+  // Brand Colors
+  static const deepCrimson = Color(0xFF8B0000); // Deep rich crimson
+  static const festiveRed = Color(0xFFD32F2F);
+  static const primary50 = Color(0xFFFFF1F2);
+  static const primary500 = Color(0xFFD32F2F);
+  static const primary600 = Color(0xFFB71C1C);
+  static const primary700 = Color(0xFF7F0000);
+  
+  static const accentGold = Color(0xFFFFD700); // Pure Gold
+  static const goldFoil = Color(0xFFD4AF37); // Gold Foil
+  
+  static const success = Color(0xFF00C853);
+  static const danger = Color(0xFFFF1744);
 
-  static const bgMain = Color(0xFFFBFBFD);
+  // Background & UI
+  static const bgMain = Color(0xFFFDFDFD);
   static const bgCard = Color(0xFFFFFFFF);
-  static const border = Color(0xFFE5E7EB);
-  static const textPrimary = Color(0xFF0F172A);
-  static const textSecondary = Color(0xFF6B7280);
-  static const textMuted = Color(0xFF9CA3AF);
+  static const border = Color(0xFFEEEEEE);
+  static const textPrimary = Color(0xFF1A1A1A);
+  static const textSecondary = Color(0xFF757575);
+  static const textMuted = Color(0xFFBDBDBD);
 
-  // Demo bug token: poor text contrast over soft gradient backgrounds.
-  static const textPrimaryBug = Color(0xFF1F2937);
-
-  static const darkBgMain = Color(0xFF0F172A);
-  static const darkBgCard = Color(0xFF1E293B);
-  static const darkTextPrimary = Color(0xFFF1F5F9);
+  static const darkBgMain = Color(0xFF121212);
+  static const darkBgCard = Color(0xFF1E1E1E);
+  static const darkTextPrimary = Color(0xFFFFFFFF);
 }
 
 abstract final class TetGradients {
   static const wallet = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF7F5AF0), Color(0xFF2CB67D)],
+    colors: [Color(0xFF8B0000), Color(0xFFD32F2F)],
   );
 
   static const tet = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFFFF416C), Color(0xFFFF4B2B)],
+    colors: [Color(0xFFB22222), Color(0xFFFF4B2B)],
   );
 
-  static const premium = LinearGradient(
+  static const premiumGold = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFFF9A826), Color(0xFFFFB703)],
+    colors: [Color(0xFFD4AF37), Color(0xFFFFD700)],
   );
 
   static const softBg = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xFFFFF6F6), Color(0xFFFFF1F2)],
+    colors: [Color(0xFFFFFFFF), Color(0xFFFFF8F8)],
+  );
+  
+  static const glass = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Colors.white70, Colors.white10],
   );
 }
 

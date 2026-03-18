@@ -8,6 +8,8 @@ abstract class ITetBudgetApi {
 
   Future<TetYearDto> createYear({required int year, required int totalBudget});
 
+  Future<TetYearDto> updateYear({required String yearId, required int totalBudget});
+
   Future<TetCategoryDto> createCategory({
     required String yearId,
     required String name,

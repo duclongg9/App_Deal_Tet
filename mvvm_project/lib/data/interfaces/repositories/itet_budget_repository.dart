@@ -17,6 +17,8 @@ abstract class ITetBudgetRepository {
 
   Future<TetYear> createYear({required int year, required int totalBudget});
 
+  Future<TetYear> updateYear({required String yearId, required int totalBudget});
+
   Future<TetCategory> createCategory({
     required String yearId,
     required String name,
