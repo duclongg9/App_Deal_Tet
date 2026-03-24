@@ -5,5 +5,4 @@ abstract class IAuthRepository {
   Future<AuthSession> login(String userName, String password);
   Future<AuthSession?> getCurrentSession();
   Future<void> logout();
-  Future<UserDto> signInWithGoogle();
 }

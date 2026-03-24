@@ -78,6 +78,7 @@ class LoginViewModel extends ChangeNotifier {
 
   Future<void> logout() async {
     await repo.logout();
+    await GoogleSignIn().signOut();
     session = null;
     error = null;
     notifyListeners();

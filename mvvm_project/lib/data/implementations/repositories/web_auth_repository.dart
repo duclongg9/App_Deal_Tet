@@ -36,17 +36,6 @@ class WebAuthRepository implements IAuthRepository {
   Future<void> logout() async {
     _session = null;
   }
-
-  @override
-  Future<UserDto> signInWithGoogle() async {
-    // For web/mock purposes, we can return a default user or throw UnimplementedError
-    // if you don't want to support it here.
-    return const UserDto(
-      id: 'web-google-id',
-      userName: 'Web Google User',
-      role: 'user',
-    );
-  }
 }
 
 class _SeedUser {

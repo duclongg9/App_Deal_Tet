@@ -18,13 +18,4 @@ class MockAuthRepository implements IAuthRepository {
 
   @override
   Future<void> logout() async {}
-
-  @override
-  Future<UserDto> signInWithGoogle() async {
-    return const UserDto(
-      id: 'mock-google-id',
-      userName: 'Mock Google User',
-      role: 'user',
-    );
-  }
 }
