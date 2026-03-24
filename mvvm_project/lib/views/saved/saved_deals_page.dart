@@ -105,7 +105,6 @@ class SavedDealsPage extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(TetRadius.xl),
           onTap: () {
-            if (deal.icon is! IconData) return;
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -113,8 +112,9 @@ class SavedDealsPage extends StatelessWidget {
                   dealId: deal.id,
                   name: deal.name,
                   price: deal.price,
-                  icon: deal.icon as IconData,
+                  icon: deal.icon is IconData ? deal.icon as IconData : Icons.local_offer,
                   storeName: deal.storeName,
+                  imageUrl: deal.imageUrl,
                 ),
               ),
             );
@@ -123,15 +123,30 @@ class SavedDealsPage extends StatelessWidget {
             padding: const EdgeInsets.all(TetSpacing.s4),
             child: Row(
               children: [
-                Container(
-                  width: 80, height: 80,
-                  decoration: BoxDecoration(
-                    color: TetColors.primary50,
-                    borderRadius: BorderRadius.circular(TetRadius.lg),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(TetRadius.lg),
+                  child: SizedBox(
+                    width: 80, height: 80,
+                    child: deal.imageUrl.isNotEmpty
+                        ? Image.network(
+                            deal.imageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              color: TetColors.primary50,
+                              child: Icon(
+                                deal.icon is IconData ? deal.icon as IconData : Icons.local_offer,
+                                color: TetColors.festiveRed, size: 38,
+                              ),
+                            ),
+                          )
+                        : Container(
+                            color: TetColors.primary50,
+                            child: Icon(
+                              deal.icon is IconData ? deal.icon as IconData : Icons.local_offer,
+                              color: TetColors.festiveRed, size: 38,
+                            ),
+                          ),
                   ),
-                  child: Icon(
-                    deal.icon is IconData ? deal.icon as IconData : Icons.local_offer,
-                    color: TetColors.festiveRed, size: 38),
                 ),
                 const SizedBox(width: TetSpacing.s4),
                 Expanded(

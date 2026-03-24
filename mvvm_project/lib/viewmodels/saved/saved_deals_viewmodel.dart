@@ -8,6 +8,7 @@ class SavedDeal {
   final int price;
   final String storeName;
   final dynamic icon; // IconData
+  final String imageUrl;
 
   const SavedDeal({
     required this.id,
@@ -15,12 +16,14 @@ class SavedDeal {
     required this.price,
     required this.storeName,
     required this.icon,
+    this.imageUrl = '',
   });
 
   Map<String, dynamic> toFirestore() => {
         'name': name,
         'price': price,
         'storeName': storeName,
+        'imageUrl': imageUrl,
       };
 }
 
@@ -62,6 +65,7 @@ class SavedDealsViewModel extends ChangeNotifier {
           price: (data['price'] as num?)?.toInt() ?? 0,
           storeName: data['storeName'] as String? ?? '',
           icon: null,
+          imageUrl: data['imageUrl'] as String? ?? '',
         ));
       }
       _loaded = true;

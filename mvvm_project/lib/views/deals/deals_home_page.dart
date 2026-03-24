@@ -12,122 +12,102 @@ final List<Map<String, dynamic>> kAllDeals = [
   {
     'id': '1', 'name': 'Thùng Bia Heineken', 'price': 450000, 'oldPrice': 480000,
     'icon': Icons.local_drink, 'store': 'Bách Hóa Xanh', 'storeColor': const Color(0xFF00897B),
-    'category': 'Đồ Uống', 'imageUrl': 'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&q=80',
-    'discount': 6,
+    'category': 'Đồ Uống', 'imageUrl': 'https://loremflickr.com/400/400/beer', 'discount': 6,
   },
   {
     'id': '2', 'name': 'Hộp Mứt Tết Cao Cấp', 'price': 160000, 'oldPrice': 320000,
     'icon': Icons.cookie, 'store': 'Co.opmart', 'storeColor': const Color(0xFF1976D2),
-    'category': 'Quà Biếu', 'imageUrl': 'https://images.unsplash.com/photo-1607920591413-4ec007e70023?w=400&q=80',
-    'discount': 50,
+    'category': 'Quà Biếu', 'imageUrl': 'https://loremflickr.com/400/400/candy,box', 'discount': 50,
   },
   {
     'id': '3', 'name': 'Bánh Chưng Đặc Biệt', 'price': 120000, 'oldPrice': 150000,
     'icon': Icons.bakery_dining, 'store': 'Siêu thị Vinmart', 'storeColor': const Color(0xFF7B1FA2),
-    'category': 'Đặc Sản', 'imageUrl': 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80',
-    'discount': 20,
+    'category': 'Đặc Sản', 'imageUrl': 'https://loremflickr.com/400/400/vietnamese,food', 'discount': 20,
   },
   {
     'id': '4', 'name': 'Rượu Vang Chi-lê', 'price': 550000, 'oldPrice': 1100000,
     'icon': Icons.wine_bar, 'store': 'Lotte Mart', 'storeColor': const Color(0xFFC62828),
-    'category': 'Đồ Uống', 'imageUrl': 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&q=80',
-    'discount': 50,
+    'category': 'Đồ Uống', 'imageUrl': 'https://loremflickr.com/400/400/redwine', 'discount': 50,
   },
   {
     'id': '5', 'name': 'Hộp Quà Trà Ô Long', 'price': 110000, 'oldPrice': 220000,
     'icon': Icons.local_cafe, 'store': 'Phúc Long', 'storeColor': const Color(0xFF388E3C),
-    'category': 'Quà Biếu', 'imageUrl': 'https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=400&q=80',
-    'discount': 50,
+    'category': 'Quà Biếu', 'imageUrl': 'https://loremflickr.com/400/400/tea', 'discount': 50,
   },
   {
     'id': '6', 'name': 'Gói Hạt Châu Mỹ', 'price': 95000, 'oldPrice': 120000,
     'icon': Icons.breakfast_dining, 'store': 'Bách Hóa Xanh', 'storeColor': const Color(0xFF00897B),
-    'category': 'Đặc Sản', 'imageUrl': 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&q=80',
-    'discount': 21,
+    'category': 'Đặc Sản', 'imageUrl': 'https://loremflickr.com/400/400/seeds,snack', 'discount': 21,
   },
   {
     'id': '7', 'name': 'Đèn Lồng Trang Trí', 'price': 45000, 'oldPrice': 95000,
     'icon': Icons.light, 'store': 'Shopee Mall', 'storeColor': const Color(0xFFE64A19),
-    'category': 'Trang Trí', 'imageUrl': 'https://images.unsplash.com/photo-1583425423888-e1af0c4a09e4?w=400&q=80',
-    'discount': 53,
+    'category': 'Trang Trí', 'imageUrl': 'https://loremflickr.com/400/400/red,lantern', 'discount': 53,
   },
   {
     'id': '8', 'name': 'Hoa Mai Vàng Giả', 'price': 220000, 'oldPrice': 450000,
     'icon': Icons.filter_vintage, 'store': 'Lazada', 'storeColor': const Color(0xFF6A1B9A),
-    'category': 'Trang Trí', 'imageUrl': 'https://images.unsplash.com/photo-1490750967868-88df5691cc40?w=400&q=80',
-    'discount': 51,
+    'category': 'Trang Trí', 'imageUrl': 'https://loremflickr.com/400/400/yellow,flower', 'discount': 51,
   },
   {
     'id': '9', 'name': 'Giỏ Trái Cây Nhập', 'price': 350000, 'oldPrice': 450000,
     'icon': Icons.food_bank, 'store': 'Aeon Mall', 'storeColor': const Color(0xFFD84315),
-    'category': 'Thực Phẩm', 'imageUrl': 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&q=80',
-    'discount': 22,
+    'category': 'Thực Phẩm', 'imageUrl': 'https://loremflickr.com/400/400/fruit,basket', 'discount': 22,
   },
   {
     'id': '10', 'name': 'Bánh Tét Nhân Thập Cẩm', 'price': 80000, 'oldPrice': 100000,
     'icon': Icons.cake, 'store': 'Cửa Hàng Truyền Thống', 'storeColor': const Color(0xFF795548),
-    'category': 'Đặc Sản', 'imageUrl': 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&q=80',
-    'discount': 20,
+    'category': 'Đặc Sản', 'imageUrl': 'https://loremflickr.com/400/400/vietnam,cake', 'discount': 20,
   },
   {
     'id': '11', 'name': 'Nước Hoa Đêm Xuân', 'price': 299000, 'oldPrice': 650000,
     'icon': Icons.spa, 'store': 'Guardian', 'storeColor': const Color(0xFFAD1457),
-    'category': 'Sức Khoẻ', 'imageUrl': 'https://images.unsplash.com/photo-1541643600914-78b084683702?w=400&q=80',
-    'discount': 54,
+    'category': 'Sức Khoẻ', 'imageUrl': 'https://loremflickr.com/400/400/perfume', 'discount': 54,
   },
   {
     'id': '12', 'name': 'Bộ Sưu Tập Decor Xuân', 'price': 180000, 'oldPrice': 380000,
     'icon': Icons.home_outlined, 'store': 'IKEA VN', 'storeColor': const Color(0xFF1565C0),
-    'category': 'Trang Trí', 'imageUrl': 'https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=400&q=80',
-    'discount': 53,
+    'category': 'Trang Trí', 'imageUrl': 'https://loremflickr.com/400/400/homedecor', 'discount': 53,
   },
   {
     'id': '13', 'name': 'Áo Dài Cách Tân Nữ', 'price': 450000, 'oldPrice': 900000,
     'icon': Icons.style, 'store': 'Zara VN', 'storeColor': const Color(0xFF212121),
-    'category': 'Thời Trang', 'imageUrl': 'https://images.unsplash.com/photo-1617521124379-66a24e99fb74?w=400&q=80',
-    'discount': 50,
+    'category': 'Thời Trang', 'imageUrl': 'https://loremflickr.com/400/400/aodai', 'discount': 50,
   },
   {
     'id': '14', 'name': 'Combo Snack Tết 10 Gói', 'price': 120000, 'oldPrice': 200000,
     'icon': Icons.fastfood, 'store': 'WinMart', 'storeColor': const Color(0xFF1B5E20),
-    'category': 'Thực Phẩm', 'imageUrl': 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=400&q=80',
-    'discount': 40,
+    'category': 'Thực Phẩm', 'imageUrl': 'https://loremflickr.com/400/400/snacks', 'discount': 40,
   },
   {
     'id': '15', 'name': 'Nến Thơm Phòng Khách', 'price': 89000, 'oldPrice': 180000,
     'icon': Icons.wb_sunny_outlined, 'store': 'Shopee Mall', 'storeColor': const Color(0xFFE64A19),
-    'category': 'Trang Trí', 'imageUrl': 'https://images.unsplash.com/photo-1602178585069-f768f37185f4?w=400&q=80',
-    'discount': 51,
+    'category': 'Trang Trí', 'imageUrl': 'https://loremflickr.com/400/400/scented,candle', 'discount': 51,
   },
   {
     'id': '16', 'name': 'Rổ Mây Đựng Quà', 'price': 65000, 'oldPrice': 130000,
     'icon': Icons.shopping_basket, 'store': 'Tiki', 'storeColor': const Color(0xFF0D47A1),
-    'category': 'Quà Biếu', 'imageUrl': 'https://images.unsplash.com/photo-1557821552-17105176677c?w=400&q=80',
-    'discount': 50,
+    'category': 'Quà Biếu', 'imageUrl': 'https://loremflickr.com/400/400/wicker,basket', 'discount': 50,
   },
   {
     'id': '17', 'name': 'Trà Dilmah Hộp Quà', 'price': 250000, 'oldPrice': 330000,
     'icon': Icons.emoji_food_beverage, 'store': 'Co.opmart', 'storeColor': const Color(0xFF1976D2),
-    'category': 'Quà Biếu', 'imageUrl': 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&q=80',
-    'discount': 24,
+    'category': 'Quà Biếu', 'imageUrl': 'https://loremflickr.com/400/400/tea', 'discount': 24,
   },
   {
     'id': '18', 'name': 'Máy Xay Sinh Tố Mini', 'price': 299000, 'oldPrice': 599000,
     'icon': Icons.blender, 'store': 'Điện Máy Xanh', 'storeColor': const Color(0xFF0277BD),
-    'category': 'Sức Khoẻ', 'imageUrl': 'https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=400&q=80',
-    'discount': 50,
+    'category': 'Sức Khoẻ', 'imageUrl': 'https://loremflickr.com/400/400/blender', 'discount': 50,
   },
   {
     'id': '19', 'name': 'Set 3 Khăn Lụa Tơ Tằm', 'price': 390000, 'oldPrice': 790000,
     'icon': Icons.dry_cleaning, 'store': 'Lụa Hà Đông', 'storeColor': const Color(0xFF880E4F),
-    'category': 'Thời Trang', 'imageUrl': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
-    'discount': 51,
+    'category': 'Thời Trang', 'imageUrl': 'https://loremflickr.com/400/400/silk', 'discount': 51,
   },
   {
     'id': '20', 'name': 'Viên Nano Nghệ Mật Ong', 'price': 150000, 'oldPrice': 300000,
     'icon': Icons.medical_services_outlined, 'store': 'Long Châu', 'storeColor': const Color(0xFF00695C),
-    'category': 'Sức Khoẻ', 'imageUrl': 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&q=80',
-    'discount': 50,
+    'category': 'Sức Khoẻ', 'imageUrl': 'https://loremflickr.com/400/400/honey', 'discount': 50,
   },
 ];
 
@@ -136,16 +116,17 @@ final List<Map<String, dynamic>> _kBanners = [
   {
     'tag': 'SALE KHỦNG 50%',
     'title': 'Siêu Deal Tết\nAn Khang 2026',
-    'button': 'Xem Ngay',
+    'button': 'Khám Phá',
     'icon': Icons.filter_vintage,
     'filterSale50': true,
     'gradient': TetGradients.tet,
   },
   {
-    'tag': 'MIỄN PHÍ VẬN CHUYỂN',
-    'title': 'Giao Hàng Tận Nơi\nToàn Quốc 🚚',
-    'button': 'Khám Phá',
+    'tag': 'GIAO HÀNG TẬN NƠI',
+    'title': 'Giao Ưu Đãi\nTận Cửa Phận Sáng 🚚',
+    'button': 'Mua Ngay',
     'icon': Icons.local_shipping_outlined,
+    'filterCategory': 'Thực Phẩm', // Changed to filter category
     'filterSale50': false,
     'gradient': const LinearGradient(
       colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
@@ -153,10 +134,11 @@ final List<Map<String, dynamic>> _kBanners = [
     ),
   },
   {
-    'tag': 'DEAL ĐẶC SẢN',
-    'title': 'Đặc Sản Vùng Miền\nChính Hãng 🎋',
-    'button': 'Xem Ngay',
+    'tag': 'ĐẶC SẢN VÙNG MIỀN',
+    'title': 'Tinh Hoa Việt\nCho Mùa Xuân Mới 🎋',
+    'button': 'Khám Phá',
     'icon': Icons.restaurant_menu,
+    'filterCategory': 'Đặc Sản', // Changed to filter category
     'filterSale50': false,
     'gradient': const LinearGradient(
       colors: [Color(0xFF1B5E20), Color(0xFF388E3C)],
@@ -174,6 +156,7 @@ class DealsHomePage extends StatefulWidget {
 }
 
 class _DealsHomePageState extends State<DealsHomePage> {
+  final List<Map<String, dynamic>> _allDeals = kAllDeals;
   String _searchQuery = '';
   String _selectedCategory = 'Tất cả';
   bool _showOnlySale50 = false;
@@ -211,7 +194,7 @@ class _DealsHomePageState extends State<DealsHomePage> {
   }
 
   List<Map<String, dynamic>> get _filteredDeals {
-    var result = kAllDeals;
+    var result = _allDeals;
     if (_showOnlySale50) {
       result = result.where((d) => (d['discount'] as int) >= 50).toList();
     }
@@ -362,7 +345,20 @@ class _DealsHomePageState extends State<DealsHomePage> {
               final banner = _kBanners[i];
               return GestureDetector(
                 onTap: () {
-                  if (banner['filterSale50'] == true) _activateSale50Filter();
+                  if (banner['filterSale50'] == true) {
+                    _activateSale50Filter();
+                  } else if (banner['filterCategory'] != null) {
+                    setState(() {
+                      _selectedCategory = banner['filterCategory'] as String;
+                      _showOnlySale50 = false;
+                      _searchQuery = '';
+                    });
+                    Future.delayed(const Duration(milliseconds: 300), () {
+                      if (!mounted) return;
+                      _scrollController.animateTo(
+                        360, duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
+                    });
+                  }
                 },
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 2),
@@ -399,7 +395,20 @@ class _DealsHomePageState extends State<DealsHomePage> {
                             ),
                             ElevatedButton(
                               onPressed: () {
-                                if (banner['filterSale50'] == true) _activateSale50Filter();
+                                if (banner['filterSale50'] == true) {
+                                  _activateSale50Filter();
+                                } else if (banner['filterCategory'] != null) {
+                                  setState(() {
+                                    _selectedCategory = banner['filterCategory'] as String;
+                                    _showOnlySale50 = false;
+                                    _searchQuery = '';
+                                  });
+                                  Future.delayed(const Duration(milliseconds: 300), () {
+                                    if (!mounted) return;
+                                    _scrollController.animateTo(
+                                      360, duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
+                                  });
+                                }
                               },
                               style: ElevatedButton.styleFrom(
                                 minimumSize: const Size(0, 36),
@@ -630,6 +639,7 @@ class _DealsHomePageState extends State<DealsHomePage> {
                               id: deal['id'] as String, name: deal['name'] as String,
                               price: deal['price'] as int, storeName: storeName,
                               icon: deal['icon'],
+                              imageUrl: deal['imageUrl'] as String,
                             ));
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text(isSaved ? 'Đã xóa khỏi danh sách lưu' : '✓ Đã lưu deal!'),

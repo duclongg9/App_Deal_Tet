@@ -64,7 +64,7 @@ class ProductDetailPage extends StatelessWidget {
             icon: Icon(isSaved ? Icons.favorite : Icons.favorite_border,
                 color: isSaved ? TetColors.festiveRed : TetColors.textMuted),
             onPressed: () {
-              vm.toggleSave(SavedDeal(id: dealId, name: name, price: price, storeName: storeName, icon: icon));
+              vm.toggleSave(SavedDeal(id: dealId, name: name, price: price, storeName: storeName, icon: icon, imageUrl: imageUrl));
               ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
                 content: Text(isSaved ? 'Đã xóa khỏi danh sách lưu' : '✓ Đã lưu deal!'),
                 duration: const Duration(seconds: 1),
@@ -175,7 +175,7 @@ class ProductDetailPage extends StatelessWidget {
                 child: IconButton(
                   icon: Icon(isSaved ? Icons.bookmark : Icons.bookmark_border,
                       color: isSaved ? TetColors.festiveRed : TetColors.textMuted),
-                  onPressed: () => vm.toggleSave(SavedDeal(id: dealId, name: name, price: price, storeName: storeName, icon: icon)),
+                  onPressed: () => vm.toggleSave(SavedDeal(id: dealId, name: name, price: price, storeName: storeName, icon: icon, imageUrl: imageUrl)),
                 ),
               );
             }),
@@ -247,26 +247,53 @@ class ProductDetailPage extends StatelessWidget {
                     return InkWell(
                       onTap: () async {
                         Navigator.pop(sheetContext);
+                        final spent = budgetVM.spentByCategory(cat.id);
+                        final isExceeding = (spent + price) > cat.budget;
+
                         await budgetVM.addProduct(
                           categoryId: cat.id,
                           name: name,
                           price: price,
                           date: DateTime.now(),
-                          imagePath: '',
+                          imagePath: imageUrl,
                           receiptImagePath: '',
                           description: 'Từ cửa hàng: $storeName',
                         );
-                        // Add notification
-                        notifVM.addNotification(
-                          title: '✅ Đã thêm vào ngân sách',
-                          body: '"$name" (${_fmt(price)}đ) đã được thêm vào mục ${cat.name}.',
-                          type: NotificationType.budget,
-                        );
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('🌸 Đã thêm vào mục ${cat.name}!'),
-                            backgroundColor: TetColors.success,
-                          ));
+                        
+                        if (isExceeding) {
+                          notifVM.addNotification(
+                            title: '⚠ Vượt ngân sách!',
+                            body: 'Hạng mục ${cat.name} đã vượt quá ngân sách cho phép.',
+                            type: NotificationType.budget,
+                          );
+                          if (context.mounted) {
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: const Row(children: [
+                                  Icon(Icons.warning_amber_rounded, color: TetColors.danger),
+                                  SizedBox(width: 8),
+                                  Text('Cảnh báo ngân sách', style: TextStyle(color: TetColors.danger, fontSize: 18))
+                                ]),
+                                content: Text('Việc mua "$name" đã làm hạng mục "${cat.name}" vượt quá ngân sách dự kiến!'),
+                                actions: [
+                                  TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Đã hiểu')),
+                                ],
+                              ),
+                            );
+                          }
+                        } else {
+                          notifVM.addNotification(
+                            title: '✅ Đã thêm vào ngân sách',
+                            body: '"$name" (${_fmt(price)}đ) đã được thêm vào mục ${cat.name}.',
+                            type: NotificationType.budget,
+                          );
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('🌸 Đã thêm vào mục ${cat.name}!'),
+                              backgroundColor: TetColors.success,
+                            ));
+                          }
                         }
                       },
                       child: Container(

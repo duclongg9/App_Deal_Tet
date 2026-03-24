@@ -1,6 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter/material.dart';
 import 'package:mvvm_project/design_system/tet_design_tokens.dart';
+import 'package:mvvm_project/domain/entities/auth_session.dart';
+import 'package:mvvm_project/domain/entities/user.dart';
+import 'package:mvvm_project/viewmodels/login/login_viewmodel.dart';
 import 'package:mvvm_project/views/login_page.dart';
+import 'package:mvvm_project/views/main/main_layout_page.dart';
+import 'package:provider/provider.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -32,19 +38,49 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
     _controller.forward();
 
-    // Navigate to Login after delay
-    Future.delayed(const Duration(seconds: 4), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            transitionDuration: const Duration(milliseconds: 800),
-          ),
-        );
+    // Restore existing Firebase session or go to Login
+    Future.delayed(const Duration(seconds: 2), () async {
+      if (!mounted) return;
+      final fbUser = fb.FirebaseAuth.instance.currentUser;
+      if (fbUser != null) {
+        // Restore session in LoginViewModel so views have a logged-in user
+        final loginVM = context.read<LoginViewModel>();
+        if (loginVM.session == null) {
+          loginVM.restoreSession(AuthSession(
+            token: await fbUser.getIdToken() ?? 'restored-token',
+            user: User(
+              id: fbUser.uid,
+              userName: fbUser.displayName ?? fbUser.email ?? 'User',
+              role: 'user',
+            ),
+          ));
+        }
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => MainLayoutPage(
+                userName: fbUser.displayName ?? fbUser.email ?? 'User',
+              ),
+              transitionsBuilder: (_, animation, __, child) =>
+                  FadeTransition(opacity: animation, child: child),
+              transitionDuration: const Duration(milliseconds: 600),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              transitionDuration: const Duration(milliseconds: 800),
+            ),
+          );
+        }
       }
     });
   }

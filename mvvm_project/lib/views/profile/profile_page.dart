@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mvvm_project/design_system/tet_design_tokens.dart';
 import 'package:mvvm_project/viewmodels/login/login_viewmodel.dart';
@@ -53,6 +54,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildProfileHeader(BuildContext context, String name) {
+    final photoUrl = FirebaseAuth.instance.currentUser?.photoURL;
     return Container(
       padding: const EdgeInsets.all(TetSpacing.s6),
       child: Column(
@@ -69,10 +71,13 @@ class ProfilePage extends StatelessWidget {
                 child: CircleAvatar(
                   radius: 56,
                   backgroundColor: TetColors.primary50,
-                  child: Text(
-                    name.isNotEmpty ? name[0].toUpperCase() : '?',
-                    style: const TextStyle(fontSize: 42, fontWeight: FontWeight.w900, color: TetColors.festiveRed),
-                  ),
+                  backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
+                  child: photoUrl == null 
+                      ? Text(
+                          name.isNotEmpty ? name[0].toUpperCase() : '?',
+                          style: const TextStyle(fontSize: 42, fontWeight: FontWeight.w900, color: TetColors.festiveRed),
+                        )
+                      : null,
                 ),
               ),
             ),

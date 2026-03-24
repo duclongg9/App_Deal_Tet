@@ -13,6 +13,7 @@ class TetBudgetViewModel extends ChangeNotifier {
   final List<TetProduct> _products = [];
 
   String? _selectedYearId;
+  bool isLoading = false;
 
   List<TetYear> get years => List.unmodifiable(_years);
   List<TetCategory> get categories => List.unmodifiable(_categories);
@@ -25,51 +26,13 @@ class TetBudgetViewModel extends ChangeNotifier {
 
   Future<void> ensureSeedData() async {
     if (_years.isNotEmpty) return;
+    
+    isLoading = true;
+    notifyListeners();
 
     await _reload();
-    if (_years.isNotEmpty) return;
 
-    final now = DateTime.now();
-    final currentYear = now.year;
-    final nextYear = currentYear + 1;
-
-    // Tạo ngân sách năm hiện tại
-    final year1 = await createYear(year: currentYear, totalBudget: 6000000, silent: true);
-    await createCategory(yearId: year1.id, name: 'Bánh kẹo', budget: 1000000, silent: true);
-    await createCategory(yearId: year1.id, name: 'Lì xì', budget: 2000000, silent: true);
-    await createCategory(yearId: year1.id, name: 'Trang trí', budget: 1500000, silent: true);
-
-    final candyCat = categoriesByYear(year1.id).firstWhere((e) => e.name == 'Bánh kẹo');
-    final luckyMoneycat = categoriesByYear(year1.id).firstWhere((e) => e.name == 'Lì xì');
-
-    await addProduct(
-      categoryId: candyCat.id,
-      name: 'Hộp mứt ABC',
-      price: 450000,
-      date: DateTime(currentYear, 1, 26),
-      imagePath: '',
-      receiptImagePath: '',
-      description: 'Siêu thị X',
-      silent: true,
-    );
-    await addProduct(
-      categoryId: luckyMoneycat.id,
-      name: 'Bao lì xì vàng',
-      price: 300000,
-      date: DateTime(currentYear, 1, 20),
-      imagePath: '',
-      receiptImagePath: '',
-      description: 'Nhà sách Y',
-      silent: true,
-    );
-
-    // Tạo ngân sách năm tiếp theo
-    final year2 = await createYear(year: nextYear, totalBudget: 7000000, silent: true);
-    await createCategory(yearId: year2.id, name: 'Bánh kẹo', budget: 1200000, silent: true);
-    await createCategory(yearId: year2.id, name: 'Lì xì', budget: 2500000, silent: true);
-    await createCategory(yearId: year2.id, name: 'Trang trí', budget: 1800000, silent: true);
-    await createCategory(yearId: year2.id, name: 'Đồ uống', budget: 1000000, silent: true);
-
+    isLoading = false;
     notifyListeners();
   }
 
@@ -236,9 +199,13 @@ class TetBudgetViewModel extends ChangeNotifier {
         ..clear()
         ..addAll(bundle.products);
 
+      // Auto-select the year matching the current calendar year, fallback to first
       if (_selectedYearId == null && _years.isNotEmpty) {
-        _selectedYearId = _years.first.id;
+        final currentYear = DateTime.now().year;
+        final match = _years.where((y) => y.year == currentYear).firstOrNull;
+        _selectedYearId = (match ?? _years.first).id;
       }
+      notifyListeners();
     } catch (e) {
       // Firestore not yet enabled or network error — app continues gracefully
       // ignore: avoid_print

@@ -1,11 +1,12 @@
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
 import 'package:mvvm_project/design_system/tet_design_tokens.dart';
 import 'package:mvvm_project/domain/entities/tet_models.dart';
 import 'package:mvvm_project/viewmodels/tet/tet_budget_viewmodel.dart';
 import 'package:mvvm_project/views/deals/deals_home_page.dart';
+import 'package:mvvm_project/views/deals/product_detail_page.dart';
 import 'package:provider/provider.dart';
 
 class BudgetPage extends StatefulWidget {
@@ -114,26 +115,87 @@ class _BudgetPageState extends State<BudgetPage> {
           const SizedBox(width: 8),
         ],
       ),
-      body: selectedYear == null
+      body: vm.isLoading
           ? const Center(child: CircularProgressIndicator(color: TetColors.festiveRed))
-          : ListView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.all(TetSpacing.s5),
-              children: [
-                _buildBudgetCard(vm, selectedYear),
-                const SizedBox(height: TetSpacing.s8),
-                _buildSectionHeader('Phân Bổ Chi Tiêu', () => _showCategoryDialog(context, selectedYear, vm)),
-                const SizedBox(height: TetSpacing.s4),
-                _buildChartSection(vm, selectedYear),
-                const SizedBox(height: TetSpacing.s4),
-                _buildCategoryList(vm, selectedYear),
-                const SizedBox(height: TetSpacing.s8),
-                _buildSectionHeader('Lịch Sử Mua Sắm', null),
-                const SizedBox(height: TetSpacing.s4),
-                _buildProductHistory(vm, selectedYear),
-                const SizedBox(height: 100),
-              ],
+          : selectedYear == null
+              ? _buildEmptyState(context, vm)
+              : ListView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.all(TetSpacing.s5),
+                  children: [
+                    _buildBudgetCard(vm, selectedYear),
+                    const SizedBox(height: TetSpacing.s8),
+                    _buildSectionHeader('Phân Bổ Chi Tiêu', () => _showCategoryDialog(context, selectedYear, vm)),
+                    const SizedBox(height: TetSpacing.s4),
+                    _buildChartSection(vm, selectedYear),
+                    const SizedBox(height: TetSpacing.s4),
+                    _buildCategoryList(vm, selectedYear),
+                    const SizedBox(height: TetSpacing.s8),
+                    _buildSectionHeader('Lịch Sử Mua Sắm', null),
+                    const SizedBox(height: TetSpacing.s4),
+                    _buildProductHistory(vm, selectedYear),
+                    const SizedBox(height: 100),
+                  ],
+                ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context, TetBudgetViewModel vm) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(color: TetColors.primary50, shape: BoxShape.circle),
+            child: const Icon(Icons.account_balance_wallet_outlined, size: 64, color: TetColors.festiveRed),
+          ),
+          const SizedBox(height: 24),
+          const Text('Chưa có ngân sách nào', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 8),
+          const Text('Hãy tạo ngân sách của bạn để quản lý\nchi tiêu mùa Tết rủng rỉnh hơn nhé!',
+              textAlign: TextAlign.center, style: TextStyle(color: TetColors.textSecondary, height: 1.5)),
+          const SizedBox(height: 32),
+          ElevatedButton.icon(
+            onPressed: () => _showCreateFirstYearDialog(context, vm),
+            icon: const Icon(Icons.add, size: 18),
+            label: const Text('Bắt đầu Tạo Ngân Sách', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: TetColors.festiveRed,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TetRadius.full)),
+              elevation: 0,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showCreateFirstYearDialog(BuildContext context, TetBudgetViewModel vm) async {
+    final formKey = GlobalKey<FormState>();
+    final budgetCtrl = TextEditingController();
+    await showModalBottomSheet(
+      context: context, isScrollControlled: true, backgroundColor: Colors.transparent,
+      builder: (ctx) => _buildSheet(
+        title: 'Khởi tạo Ngân Sách Tết ${DateTime.now().year}',
+        form: Form(
+          key: formKey,
+          child: _buildFormField(budgetCtrl, 'Tổng Ngân Sách Khởi Điểm (đ)', Icons.attach_money, type: TextInputType.number,
+            validator: (v) {
+              final b = int.tryParse(v?.replaceAll('.', '') ?? '');
+              if (b == null || b <= 0) return 'Ngân sách phải lớn hơn 0';
+              return null;
+            }),
+        ),
+        onSave: () async {
+          if (!formKey.currentState!.validate()) return;
+          final budget = int.parse(budgetCtrl.text.replaceAll('.', ''));
+          await vm.createYear(year: DateTime.now().year, totalBudget: budget);
+          if (ctx.mounted) Navigator.pop(ctx);
+        },
+      ),
     );
   }
 
@@ -410,6 +472,25 @@ class _BudgetPageState extends State<BudgetPage> {
                 ),
                 Expanded(
                   child: ListTile(
+                    onTap: () {
+                      if (product.imagePath.isNotEmpty && product.imagePath.startsWith('http')) {
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (_) => ProductDetailPage(
+                            dealId: product.id,
+                            name: product.name,
+                            price: product.price,
+                            icon: Icons.receipt_long,
+                            storeName: 'Ngân Sách Tết',
+                            imageUrl: product.imagePath,
+                          ),
+                        ));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text('Sản phẩm này không có chi tiết.'),
+                          duration: Duration(seconds: 2),
+                        ));
+                      }
+                    },
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     title: Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     subtitle: Text(
@@ -655,56 +736,32 @@ class _BudgetPageState extends State<BudgetPage> {
                         ),
                       ),
                       const SizedBox(height: TetSpacing.s4),
-                      // Image selection row
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton.icon(
-                              onPressed: () async {
-                                // Pick from Deal Catalog
-                                final deal = await showModalBottomSheet<Map<String, dynamic>>(
-                                  context: ctx,
-                                  backgroundColor: Colors.transparent,
-                                  isScrollControlled: true,
-                                  builder: (_) => _DealPickerSheet(),
-                                );
-                                if (deal != null) {
-                                  setModalState(() {
-                                    selectedImagePath = deal['imageUrl'] as String;
-                                    nameCtrl.text = deal['name'] as String;
-                                    priceCtrl.text = '${deal['price']}';
-                                  });
-                                }
-                              },
-                              icon: const Icon(Icons.local_offer_outlined, size: 16),
-                              label: const Text('Từ Deal', style: TextStyle(fontSize: 12)),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: TetColors.festiveRed,
-                                side: const BorderSide(color: TetColors.festiveRed),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TetRadius.md)),
-                                padding: const EdgeInsets.symmetric(vertical: 10),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: OutlinedButton.icon(
-                              onPressed: () async {
-                                final picker = ImagePicker();
-                                final img = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
-                                if (img != null) setModalState(() => selectedImagePath = img.path);
-                              },
-                              icon: const Icon(Icons.photo_library_outlined, size: 16),
-                              label: const Text('Từ Máy', style: TextStyle(fontSize: 12)),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: TetColors.festiveRed,
-                                side: const BorderSide(color: TetColors.festiveRed),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TetRadius.md)),
-                                padding: const EdgeInsets.symmetric(vertical: 10),
-                              ),
-                            ),
-                          ),
-                        ],
+                      // Chọn ảnh từ catalog Deal
+                      OutlinedButton.icon(
+                        onPressed: () async {
+                          final deal = await showModalBottomSheet<Map<String, dynamic>>(
+                            context: ctx,
+                            backgroundColor: Colors.transparent,
+                            isScrollControlled: true,
+                            builder: (_) => _DealPickerSheet(),
+                          );
+                          if (deal != null) {
+                            setModalState(() {
+                              selectedImagePath = deal['imageUrl'] as String;
+                              nameCtrl.text = deal['name'] as String;
+                              priceCtrl.text = '${deal['price']}';
+                            });
+                          }
+                        },
+                        icon: const Icon(Icons.local_offer_outlined, size: 16),
+                        label: const Text('Chọn từ Catalog Deal 🛍️', style: TextStyle(fontSize: 13)),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: TetColors.festiveRed,
+                          side: const BorderSide(color: TetColors.festiveRed),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TetRadius.md)),
+                          minimumSize: const Size(double.infinity, 44),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                        ),
                       ),
                       if (selectedImagePath.isNotEmpty) ...[
                         const SizedBox(height: 8),
@@ -717,26 +774,6 @@ class _BudgetPageState extends State<BudgetPage> {
                           ),
                         ),
                       ],
-                      const SizedBox(height: TetSpacing.s4),
-                      // Receipt image
-                      OutlinedButton.icon(
-                        onPressed: () async {
-                          final picker = ImagePicker();
-                          final img = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
-                          if (img != null) setModalState(() => selectedReceiptPath = img.path);
-                        },
-                        icon: const Icon(Icons.receipt_long_outlined, size: 16),
-                        label: Text(
-                          selectedReceiptPath.isEmpty ? 'Thêm Ảnh Hóa Đơn / Bill 📷' : '✓ Đã chọn ảnh bill',
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: selectedReceiptPath.isEmpty ? TetColors.textSecondary : TetColors.success,
-                          side: BorderSide(color: selectedReceiptPath.isEmpty ? TetColors.border : TetColors.success),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TetRadius.md)),
-                          minimumSize: const Size(double.infinity, 44),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -747,7 +784,12 @@ class _BudgetPageState extends State<BudgetPage> {
                   child: ElevatedButton(
                     onPressed: () async {
                       if (!formKey.currentState!.validate()) return;
-                      final price = int.parse(priceCtrl.text.replaceAll('.', ''));
+                      final priceStr = priceCtrl.text.replaceAll(RegExp(r'\D'), '');
+                      final price = int.parse(priceStr.isEmpty ? '0' : priceStr);
+                      
+                      final spent = vm.spentByCategory(cat.id);
+                      final isExceeding = (spent + price) > cat.budget;
+
                       await vm.addProduct(
                         categoryId: cat.id,
                         name: nameCtrl.text.trim(),
@@ -759,10 +801,27 @@ class _BudgetPageState extends State<BudgetPage> {
                       );
                       if (ctx.mounted) Navigator.pop(ctx);
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('✅ Đã thêm "${nameCtrl.text.trim()}" vào ${cat.name}!'),
-                          backgroundColor: TetColors.success,
-                        ));
+                        if (isExceeding) {
+                          showDialog(
+                            context: context,
+                            builder: (dialogCtx) => AlertDialog(
+                              title: const Row(children: [
+                                Icon(Icons.warning_amber_rounded, color: TetColors.danger),
+                                SizedBox(width: 8),
+                                Text('Cảnh báo ngân sách', style: TextStyle(color: TetColors.danger, fontSize: 18))
+                              ]),
+                              content: Text('Sản phẩm "${nameCtrl.text.trim()}" đã làm hạng mục "${cat.name}" vượt quá ngân sách!'),
+                              actions: [
+                                TextButton(onPressed: () => Navigator.pop(dialogCtx), child: const Text('Đã hiểu')),
+                              ],
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('✅ Đã thêm "${nameCtrl.text.trim()}" vào ${cat.name}!'),
+                            backgroundColor: TetColors.success,
+                          ));
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -923,6 +982,7 @@ class _BudgetPageState extends State<BudgetPage> {
                                           final ok = await _confirmDeleteProduct(context);
                                           if (ok) {
                                             await vm.deleteProduct(p.id);
+                                            setModalState(() {}); // refresh list
                                             if (context.mounted) {
                                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Đã xóa sản phẩm')));
                                             }
@@ -1038,12 +1098,30 @@ class _BudgetPageState extends State<BudgetPage> {
       controller: ctrl,
       keyboardType: type,
       validator: validator,
+      inputFormatters: [
+        if (type == TextInputType.number) ...[
+          FilteringTextInputFormatter.digitsOnly,
+          _CurrencyInputFormatter(),
+        ]
+      ],
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon, color: TetColors.festiveRed),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(TetRadius.md)),
       ),
     );
+  }
+}
+
+class _CurrencyInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) return newValue;
+    final numString = newValue.text.replaceAll(RegExp(r'\D'), '');
+    if (numString.isEmpty) return const TextEditingValue(text: '');
+    final number = int.parse(numString);
+    final formatted = number.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return TextEditingValue(text: formatted, selection: TextSelection.collapsed(offset: formatted.length));
   }
 }
 

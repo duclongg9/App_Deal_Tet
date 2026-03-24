@@ -91,4 +91,10 @@ class LoginViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// Restores an existing session (e.g. from Firebase Auth currentUser on cold start).
+  void restoreSession(AuthSession s) {
+    session = s;
+    notifyListeners();
+  }
 }
