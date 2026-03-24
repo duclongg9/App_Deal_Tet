@@ -61,9 +61,11 @@ class SavedDealsPage extends StatelessWidget {
                 },
                 onDismissed: (_) {
                   vm.removeDeal(deal.id);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Đã xóa khỏi danh sách lưu'), duration: Duration(seconds: 1)),
-                  );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Đã xóa khỏi danh sách lưu'), duration: Duration(seconds: 1)),
+                    );
+                  }
                 },
                 child: _buildSavedItem(context, deal),
               );
@@ -102,18 +104,21 @@ class SavedDealsPage extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(TetRadius.xl),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => ProductDetailPage(
-                dealId: deal.id,
-                name: deal.name,
-                price: deal.price,
-                icon: deal.icon as IconData,
-                storeName: deal.storeName,
+          onTap: () {
+            if (deal.icon is! IconData) return;
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ProductDetailPage(
+                  dealId: deal.id,
+                  name: deal.name,
+                  price: deal.price,
+                  icon: deal.icon as IconData,
+                  storeName: deal.storeName,
+                ),
               ),
-            ),
-          ),
+            );
+          },
           child: Padding(
             padding: const EdgeInsets.all(TetSpacing.s4),
             child: Row(
@@ -124,7 +129,9 @@ class SavedDealsPage extends StatelessWidget {
                     color: TetColors.primary50,
                     borderRadius: BorderRadius.circular(TetRadius.lg),
                   ),
-                  child: Icon(deal.icon as IconData, color: TetColors.festiveRed, size: 38),
+                  child: Icon(
+                    deal.icon is IconData ? deal.icon as IconData : Icons.local_offer,
+                    color: TetColors.festiveRed, size: 38),
                 ),
                 const SizedBox(width: TetSpacing.s4),
                 Expanded(
@@ -184,9 +191,7 @@ class SavedDealsPage extends StatelessWidget {
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Hủy')),
           TextButton(
             onPressed: () {
-              for (final d in List.from(vm.savedDeals)) {
-                vm.removeDeal(d.id);
-              }
+              vm.clearAll();
               Navigator.pop(ctx);
             },
             child: const Text('Xóa tất cả', style: TextStyle(color: TetColors.danger)),

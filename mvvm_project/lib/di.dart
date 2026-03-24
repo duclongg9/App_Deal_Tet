@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:mvvm_project/data/implementations/api/auth_api.dart';
-import 'package:mvvm_project/data/implementations/api/mock_tet_budget_api.dart';
+import 'package:mvvm_project/data/implementations/api/firestore_tet_budget_api.dart';
 import 'package:mvvm_project/data/implementations/local/app_database.dart';
 import 'package:mvvm_project/data/implementations/mapper/auth_mapper.dart';
 import 'package:mvvm_project/data/implementations/mapper/tet_budget_mapper.dart';
@@ -15,7 +15,6 @@ LoginViewModel buildLoginVM() {
     return LoginViewModel(WebAuthRepository());
   }
 
-
   return LoginViewModel(
     AuthRepository(
       api: AuthApi(AppDatabase.instance),
@@ -24,11 +23,15 @@ LoginViewModel buildLoginVM() {
   );
 }
 
-TetBudgetViewModel buildTetBudgetVM() {
+/// Build TetBudgetViewModel for a specific user using Firestore.
+/// [userId] should be the Firebase UID after login.
+TetBudgetViewModel buildTetBudgetVM(String userId) {
   return TetBudgetViewModel(
     TetBudgetRepository(
-      api: MockTetBudgetApi(),
+      api: FirestoreTetBudgetApi(userId: userId),
       mapper: TetBudgetMapper(),
     ),
+    firestoreUserId: userId,
   );
 }
+

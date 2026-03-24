@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 /// Model đơn giản cho một Deal được bookmark
@@ -15,26 +16,89 @@ class SavedDeal {
     required this.storeName,
     required this.icon,
   });
+
+  Map<String, dynamic> toFirestore() => {
+        'name': name,
+        'price': price,
+        'storeName': storeName,
+      };
 }
 
 class SavedDealsViewModel extends ChangeNotifier {
   final List<SavedDeal> _savedDeals = [];
+  String? _userId;
+  bool _loaded = false;
+
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   List<SavedDeal> get savedDeals => List.unmodifiable(_savedDeals);
 
-  bool isSaved(String dealId) => _savedDeals.any((d) => d.id == dealId);
+  CollectionReference<Map<String, dynamic>>? get _savedDealsRef {
+    if (_userId == null) return null;
+    return _db.collection('users').doc(_userId).collection('saved_deals');
+  }
 
-  void toggleSave(SavedDeal deal) {
-    if (isSaved(deal.id)) {
-      _savedDeals.removeWhere((d) => d.id == deal.id);
-    } else {
-      _savedDeals.add(deal);
-    }
+  /// Call this after login to bind the ViewModel to the user and load data.
+  Future<void> loadForUser(String userId) async {
+    if (_userId == userId && _loaded) return;
+    _userId = userId;
+    _loaded = false;
+    _savedDeals.clear();
+    notifyListeners();
+    await _fetchFromFirestore();
+  }
+
+  Future<void> _fetchFromFirestore() async {
+    final ref = _savedDealsRef;
+    if (ref == null) return;
+    try {
+      final snap = await ref.get();
+      _savedDeals.clear();
+      for (final doc in snap.docs) {
+        final data = doc.data();
+        _savedDeals.add(SavedDeal(
+          id: doc.id,
+          name: data['name'] as String? ?? '',
+          price: (data['price'] as num?)?.toInt() ?? 0,
+          storeName: data['storeName'] as String? ?? '',
+          icon: null,
+        ));
+      }
+      _loaded = true;
+    } catch (_) {}
     notifyListeners();
   }
 
-  void removeDeal(String dealId) {
+  bool isSaved(String dealId) => _savedDeals.any((d) => d.id == dealId);
+
+  Future<void> toggleSave(SavedDeal deal) async {
+    if (isSaved(deal.id)) {
+      _savedDeals.removeWhere((d) => d.id == deal.id);
+      notifyListeners();
+      await _savedDealsRef?.doc(deal.id).delete();
+    } else {
+      _savedDeals.add(deal);
+      notifyListeners();
+      await _savedDealsRef?.doc(deal.id).set(deal.toFirestore());
+    }
+  }
+
+  Future<void> removeDeal(String dealId) async {
     _savedDeals.removeWhere((d) => d.id == dealId);
+    notifyListeners();
+    await _savedDealsRef?.doc(dealId).delete();
+  }
+
+  Future<void> clearAll() async {
+    final ref = _savedDealsRef;
+    if (ref == null) return;
+    final snap = await ref.get();
+    final batch = _db.batch();
+    for (final doc in snap.docs) {
+      batch.delete(doc.reference);
+    }
+    await batch.commit();
+    _savedDeals.clear();
     notifyListeners();
   }
 }

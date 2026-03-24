@@ -4,8 +4,9 @@ import 'package:mvvm_project/domain/entities/tet_models.dart';
 
 class TetBudgetViewModel extends ChangeNotifier {
   final ITetBudgetRepository repo;
+  final String firestoreUserId;
 
-  TetBudgetViewModel(this.repo);
+  TetBudgetViewModel(this.repo, {this.firestoreUserId = 'anonymous'});
 
   final List<TetYear> _years = [];
   final List<TetCategory> _categories = [];
