@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mvvm_project/design_system/tet_design_tokens.dart';
 import 'package:mvvm_project/domain/entities/tet_models.dart';
-import 'package:mvvm_project/viewmodels/notifications/notifications_viewmodel.dart';
 import 'package:mvvm_project/viewmodels/tet/tet_budget_viewmodel.dart';
+import 'package:mvvm_project/views/deals/deals_home_page.dart';
 import 'package:provider/provider.dart';
 
 class BudgetPage extends StatefulWidget {
@@ -396,30 +398,39 @@ class _BudgetPageState extends State<BudgetPage> {
               borderRadius: BorderRadius.circular(TetRadius.lg),
               border: Border.all(color: TetColors.border),
             ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              leading: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: TetColors.primary50, borderRadius: BorderRadius.circular(TetRadius.md)),
-                child: const Icon(Icons.shopping_bag_outlined, color: TetColors.festiveRed, size: 20),
-              ),
-              title: Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text(
-                '${category?.name ?? 'N/A'} • ${_dateStr(product.date)}',
-                style: const TextStyle(fontSize: 11, color: TetColors.textSecondary),
-              ),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text('${_fmt(product.price)}đ',
-                      style: const TextStyle(fontWeight: FontWeight.w900, color: TetColors.deepCrimson, fontSize: 14)),
-                  GestureDetector(
-                    onTap: () => _showEditProductDialog(context, product, vm),
-                    child: const Text('Sửa', style: TextStyle(color: TetColors.festiveRed, fontSize: 11, fontWeight: FontWeight.bold)),
+            child: Row(
+              children: [
+                // Product image
+                ClipRRect(
+                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(TetRadius.lg)),
+                  child: SizedBox(
+                    width: 72, height: 72,
+                    child: _buildProductImage(product.imagePath),
                   ),
-                ],
-              ),
+                ),
+                Expanded(
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    title: Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    subtitle: Text(
+                      '${category?.name ?? 'N/A'} • ${_dateStr(product.date)}',
+                      style: const TextStyle(fontSize: 11, color: TetColors.textSecondary),
+                    ),
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text('${_fmt(product.price)}đ',
+                            style: const TextStyle(fontWeight: FontWeight.w900, color: TetColors.deepCrimson, fontSize: 14)),
+                        GestureDetector(
+                          onTap: () => _showEditProductDialog(context, product, vm),
+                          child: const Text('Sửa', style: TextStyle(color: TetColors.festiveRed, fontSize: 11, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -530,11 +541,34 @@ class _BudgetPageState extends State<BudgetPage> {
   }
 
   /// Thêm sản phẩm thủ công vào hạng mục
+  Widget _buildProductImage(String imagePath) {
+    if (imagePath.isEmpty) {
+      return Container(
+        color: TetColors.primary50,
+        child: const Center(child: Icon(Icons.shopping_bag_outlined, color: TetColors.festiveRed, size: 28)),
+      );
+    }
+    if (imagePath.startsWith('http')) {
+      return Image.network(imagePath, fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => Container(
+            color: TetColors.primary50,
+            child: const Center(child: Icon(Icons.image_not_supported_outlined, color: TetColors.textMuted, size: 28)),
+          ));
+    }
+    return Image.file(File(imagePath), fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Container(
+          color: TetColors.primary50,
+          child: const Center(child: Icon(Icons.broken_image_outlined, color: TetColors.textMuted, size: 28)),
+        ));
+  }
+
   Future<void> _showAddProductDialog(BuildContext context, TetCategory cat, TetBudgetViewModel vm) async {
     final formKey = GlobalKey<FormState>();
     final nameCtrl = TextEditingController();
     final priceCtrl = TextEditingController();
     final descCtrl = TextEditingController();
+    String selectedImagePath = '';
+    String selectedReceiptPath = '';
     DateTime selectedDate = DateTime.now();
 
     await showModalBottomSheet(
@@ -620,6 +654,89 @@ class _BudgetPageState extends State<BudgetPage> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: TetSpacing.s4),
+                      // Image selection row
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () async {
+                                // Pick from Deal Catalog
+                                final deal = await showModalBottomSheet<Map<String, dynamic>>(
+                                  context: ctx,
+                                  backgroundColor: Colors.transparent,
+                                  isScrollControlled: true,
+                                  builder: (_) => _DealPickerSheet(),
+                                );
+                                if (deal != null) {
+                                  setModalState(() {
+                                    selectedImagePath = deal['imageUrl'] as String;
+                                    nameCtrl.text = deal['name'] as String;
+                                    priceCtrl.text = '${deal['price']}';
+                                  });
+                                }
+                              },
+                              icon: const Icon(Icons.local_offer_outlined, size: 16),
+                              label: const Text('Từ Deal', style: TextStyle(fontSize: 12)),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: TetColors.festiveRed,
+                                side: const BorderSide(color: TetColors.festiveRed),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TetRadius.md)),
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () async {
+                                final picker = ImagePicker();
+                                final img = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+                                if (img != null) setModalState(() => selectedImagePath = img.path);
+                              },
+                              icon: const Icon(Icons.photo_library_outlined, size: 16),
+                              label: const Text('Từ Máy', style: TextStyle(fontSize: 12)),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: TetColors.festiveRed,
+                                side: const BorderSide(color: TetColors.festiveRed),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TetRadius.md)),
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (selectedImagePath.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(TetRadius.md),
+                          child: SizedBox(
+                            height: 100,
+                            width: double.infinity,
+                            child: _buildProductImage(selectedImagePath),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: TetSpacing.s4),
+                      // Receipt image
+                      OutlinedButton.icon(
+                        onPressed: () async {
+                          final picker = ImagePicker();
+                          final img = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+                          if (img != null) setModalState(() => selectedReceiptPath = img.path);
+                        },
+                        icon: const Icon(Icons.receipt_long_outlined, size: 16),
+                        label: Text(
+                          selectedReceiptPath.isEmpty ? 'Thêm Ảnh Hóa Đơn / Bill 📷' : '✓ Đã chọn ảnh bill',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: selectedReceiptPath.isEmpty ? TetColors.textSecondary : TetColors.success,
+                          side: BorderSide(color: selectedReceiptPath.isEmpty ? TetColors.border : TetColors.success),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TetRadius.md)),
+                          minimumSize: const Size(double.infinity, 44),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -636,8 +753,8 @@ class _BudgetPageState extends State<BudgetPage> {
                         name: nameCtrl.text.trim(),
                         price: price,
                         date: selectedDate,
-                        imagePath: '',
-                        receiptImagePath: '',
+                        imagePath: selectedImagePath,
+                        receiptImagePath: selectedReceiptPath,
                         description: descCtrl.text.trim(),
                       );
                       if (ctx.mounted) Navigator.pop(ctx);
@@ -934,6 +1051,99 @@ String _fmt(int amount) =>
     amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
 
 String _dateStr(DateTime d) => '${d.day}/${d.month}/${d.year}';
+
+class _DealPickerSheet extends StatefulWidget {
+  @override
+  State<_DealPickerSheet> createState() => _DealPickerSheetState();
+}
+
+class _DealPickerSheetState extends State<_DealPickerSheet> {
+  String _search = '';
+
+  List<Map<String, dynamic>> get _filtered => kAllDeals
+      .where((d) => (d['name'] as String).toLowerCase().contains(_search.toLowerCase()))
+      .toList();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.75,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(TetRadius.xl)),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(TetSpacing.s5, TetSpacing.s5, TetSpacing.s5, TetSpacing.s3),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Text('Chọn Deal Từ Catalog 🛍️',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                ),
+                IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close)),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: TetSpacing.s5),
+            child: TextField(
+              onChanged: (v) => setState(() => _search = v),
+              decoration: InputDecoration(
+                hintText: 'Tìm deal...',
+                prefixIcon: const Icon(Icons.search, color: TetColors.festiveRed),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(TetRadius.lg)),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+              ),
+            ),
+          ),
+          const SizedBox(height: TetSpacing.s3),
+          const Divider(height: 1),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _filtered.length,
+              itemBuilder: (ctx, i) {
+                final deal = _filtered[i];
+                final discount = deal['discount'] as int;
+                return ListTile(
+                  onTap: () => Navigator.pop(context, deal),
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(TetRadius.md),
+                    child: Image.network(
+                      deal['imageUrl'] as String, width: 52, height: 52, fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 52, height: 52, color: TetColors.primary50,
+                        child: Icon(deal['icon'] as IconData, color: TetColors.festiveRed, size: 24),
+                      ),
+                    ),
+                  ),
+                  title: Text(deal['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  subtitle: Text(deal['store'] as String, style: const TextStyle(fontSize: 11, color: TetColors.textSecondary)),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('${_fmt(deal['price'] as int)}đ',
+                          style: const TextStyle(color: TetColors.festiveRed, fontWeight: FontWeight.w900, fontSize: 13)),
+                      if (discount >= 50)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                          decoration: BoxDecoration(color: TetColors.accentGold, borderRadius: BorderRadius.circular(4)),
+                          child: Text('-$discount%', style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: TetColors.deepCrimson)),
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 
 class _CircularPainter extends CustomPainter {
   final List<double> values;

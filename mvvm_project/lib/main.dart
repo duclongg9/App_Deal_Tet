@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mvvm_project/design_system/tet_theme.dart';
 import 'package:mvvm_project/di.dart';
+import 'package:mvvm_project/firebase_options.dart';
 import 'package:mvvm_project/viewmodels/login/login_viewmodel.dart';
 import 'package:mvvm_project/viewmodels/notifications/notifications_viewmodel.dart';
 import 'package:mvvm_project/viewmodels/saved/saved_deals_viewmodel.dart';
@@ -16,9 +17,11 @@ import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (e) {
-    // Ignored: already initialized natively via google-services.json
+    // Already initialized - safe to ignore
   }
   _configureDatabaseFactory();
   runApp(const MyApp());

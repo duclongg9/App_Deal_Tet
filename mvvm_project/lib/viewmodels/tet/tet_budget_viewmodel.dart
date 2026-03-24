@@ -224,19 +224,26 @@ class TetBudgetViewModel extends ChangeNotifier {
   }
 
   Future<void> _reload() async {
-    final bundle = await repo.fetchBundle();
-    _years
-      ..clear()
-      ..addAll(bundle.years);
-    _categories
-      ..clear()
-      ..addAll(bundle.categories);
-    _products
-      ..clear()
-      ..addAll(bundle.products);
+    try {
+      final bundle = await repo.fetchBundle();
+      _years
+        ..clear()
+        ..addAll(bundle.years);
+      _categories
+        ..clear()
+        ..addAll(bundle.categories);
+      _products
+        ..clear()
+        ..addAll(bundle.products);
 
-    if (_selectedYearId == null && _years.isNotEmpty) {
-      _selectedYearId = _years.first.id;
+      if (_selectedYearId == null && _years.isNotEmpty) {
+        _selectedYearId = _years.first.id;
+      }
+    } catch (e) {
+      // Firestore not yet enabled or network error — app continues gracefully
+      // ignore: avoid_print
+      print('[TetBudgetVM] _reload error (is Firestore enabled?): $e');
     }
   }
 }
+
