@@ -1,0 +1,7 @@
+﻿
+  mvvm_project/lib/viewmodels/tet/tet_budget_viewmodel.dart
+  mvvm_project/lib/views/admin/admin_home_page.dart
+  mvvm_project/lib/views/budget/budget_page.dart
+> mvvm_project/lib/views/deals/deals_home_page.dart
+
+

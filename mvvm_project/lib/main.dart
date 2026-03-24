@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:mvvm_project/design_system/tet_theme.dart';
 import 'package:mvvm_project/di.dart';
 import 'package:mvvm_project/viewmodels/login/login_viewmodel.dart';

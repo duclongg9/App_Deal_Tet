@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:mvvm_project/data/interfaces/repositories/iauth_repository.dart';
 import 'package:mvvm_project/domain/entities/auth_session.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb;
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mvvm_project/domain/entities/user.dart';
 
 class LoginViewModel extends ChangeNotifier {
@@ -30,35 +32,43 @@ class LoginViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> logout() async {
-    await repo.logout();
-    session = null;
-    error = null;
-    notifyListeners();
-  }
-
   Future<bool> loginWithGoogle() async {
     loading = true;
     error = null;
     notifyListeners();
 
     try {
-      final userDto = await repo.signInWithGoogle();
-      
-      // Map UserDto to domain User and create session
-      session = AuthSession(
-        token: 'firebase-token-${userDto.id}', // Use a placeholder or actual token if available
-        user: User(
-          id: userDto.id,
-          userName: userDto.userName,
-          role: userDto.role,
-        ),
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        loading = false;
+        notifyListeners();
+        return false;
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final fb.OAuthCredential credential = fb.GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
-      
-      return true;
+
+      final fb.UserCredential userCredential = await fb.FirebaseAuth.instance.signInWithCredential(credential);
+      final fbUser = userCredential.user;
+
+      if (fbUser != null) {
+        // Map to our local user entity
+        session = AuthSession(
+          token: await fbUser.getIdToken() ?? 'google-token',
+          user: User(
+            id: fbUser.uid,
+            userName: fbUser.displayName ?? fbUser.email ?? 'Google User',
+            role: 'user', // Default group login as user
+          ),
+        );
+        return true;
+      }
+      return false;
     } catch (e) {
-      session = null;
-      error = e.toString().replaceFirst('Exception: ', '');
+      error = "Lỗi Google Sign-In: $e";
       return false;
     } finally {
       loading = false;
@@ -66,7 +76,14 @@ class LoginViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> logout() async {
+    await repo.logout();
+    session = null;
+    error = null;
+    notifyListeners();
+  }
 
+  // Google login is implemented above
   void clearError() {
     if (error != null) {
       error = null;

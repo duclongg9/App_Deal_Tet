@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "500058663632",
+    "project_id": "app-deal-tet",
+    "storage_bucket": "app-deal-tet.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:500058663632:android:ff4bd14a7332fb586e0cd5",
+        "android_client_info": {
+          "package_name": "com.example.mvvm_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDweEv9XTVD4qlMEj3OEM9A5Tk5p5C9xbs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
